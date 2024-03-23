@@ -34,6 +34,76 @@ function ReceiveData()
     return s or partial
 end
 
+
+
+
+function GetTimeOfDay()
+    local time = GLOBAL.GetClock()
+    return time
+end
+
+function GetInventoryItems() 
+    local items = {}
+    local inventory = GLOBAL.GetPlayer().components.inventory
+    for k, v in pairs(inventory.itemslots) do
+        if v then
+            table.insert(items, v.prefab)
+        end
+    end
+
+    local inv_str = ""
+    for k, v in pairs(items) do
+        inv_str = inv_str .. v .. " "
+    end
+    print("Inventory: ", inv_str)
+
+    return items
+end
+
+function CanCraft(item)
+    local player = GLOBAL.GetPlayer()
+    local inventory = player.components.inventory
+    local recipes = GLOBAL.GetAllRecipes()
+    local recipe = recipes[item]
+    if recipe then
+        local ingredients = recipe.ingredients
+        for k, v in pairs(ingredients) do
+            if not inventory:Has(v.type, v.amount) then
+                return false
+            end
+        end
+        return true
+    end
+    return false
+end
+
+function CraftableItems()
+    -- get known recipes
+    local recipes = GLOBAL.GetAllRecipes()
+    local known_recipes = {}
+    for k, v in pairs(recipes) do
+        table.insert(known_recipes, v.name)
+    end
+
+    local known_str = ""
+    local count = 0
+    for k, v in pairs(known_recipes) do
+        if count > 10 then
+            break
+        end
+        known_str = known_str .. v .. " "
+        count = count + 1
+    end
+
+    print("Known recipes: ", known_str)
+
+    return known_recipes
+end
+
+
+
+
+
 function PreparePlayerCharacter(player)
     -- local numbertext = Text(GLOBAL.BUTTONFONT, 24, "Test") --Make some text
     -- numbertext:SetColour(1,1,1,1) --Set the colour to white
@@ -57,15 +127,21 @@ function PreparePlayerCharacter(player)
 		local x, y, z = player.Transform:GetWorldPosition()
 
         -- send to position to the server
-        print("Sending player position to server")
+        -- print("Sending player position to server")
         SendData("Player position:   " .. x .. "   " .. y .. "   " .. z .. "\n")        
         
-        print("Receiving from server")
+        -- print("Receiving from server")
 
-        print(ReceiveData())
-        
+        -- print(ReceiveData())
+
+        -- print("\n\n\n")
+
+        print("Time of day: ", GetTimeOfDay()) -- returns a string?
+        print("Inventory: ", GetInventoryItems()) -- returns a table
+        print("CraftableItems: ", CraftableItems()) -- returns a table
+        print("CanCraft(axe): ", CanCraft("axe")) -- returns bool
+
         print("\n\n\n")
-        
 
     end)
 
