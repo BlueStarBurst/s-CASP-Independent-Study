@@ -1,14 +1,18 @@
--- local socket = require("socket")
--- host = "localhost"
--- port = 12345
 
--- print("Attempting connection to host '" ..host.. "' and port " ..port.. "...")
--- conn=socket.tcp()
--- c = assert(conn.connect(host, port))
--- print("Connected! Please type stuff (empty line to stop):")
 
 -- A Don't Starve mod that reads the current state of the game and outputs it to a file. This is a mod for the sCASP project.
 local require = GLOBAL.require
+
+local socket = require "socket"
+local host = "localhost"
+local port = 12345
+
+local tcp = socket.tcp()
+
+-- local client = socket.connect(host, port)
+
+
+
 
 local Text = require "widgets/text"
 
@@ -25,6 +29,11 @@ function PreparePlayerCharacter(player)
     player:DoTaskInTime(0, function()
 
         
+        print("Attempting connection to host '" ..host.. "' and port " ..port.. "...")
+        tcp:connect(host, port);
+        tcp:settimeout(0.1)
+
+        tcp:send("Player position:   " .. 0 .. "   " .. 0 .. "   " .. 0 .. "\n")
 
         numbertext:SetPosition(300,100) --Put text somewhere (starts at bottom left)
 
@@ -34,6 +43,8 @@ function PreparePlayerCharacter(player)
         local x, y, z = player.Transform:GetWorldPosition()
 
 		print("Player position STARTREADER: ", x, y, z)
+
+        
 
         -- local ents = TheSim:FindEntities(x, y, z, 20, {"campfire"})
         -- player.homefirepit = ents[1]
@@ -48,6 +59,18 @@ function PreparePlayerCharacter(player)
 		print("Player position: ", x, y, z, "\nPlayer facing: ", playerfacing)
         numbertext:SetString( "Player position:   " .. x .. "   " .. y .. "   " .. z ) --Change the text on the fly
         -- GLOBAL.TheCamera:SetHeadingTarget(-playerfacing + 180)
+
+        -- send to position to the server
+        print("Sending player position to server")
+        tcp:send("Player position:   " .. x .. "   " .. y .. "   " .. z .. "\n")
+        
+        
+        print("Receiving from server")
+        local s, status, partial = tcp:receive()
+        print("Server:", s or partial)
+        print("\n\n\n")
+        
+
     end)
 
     -- debugging help

@@ -5,27 +5,19 @@
 import socket
 import time
 
-# create a socket object
-serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-# get local machine name
-host = socket.gethostname()
+HOST = "127.0.0.1"  # Standard loopback interface address (localhost)
+PORT = 12345  # Port to listen on (non-privileged ports are > 1023)
 
-port = 12345
-
-# bind to the port
-serversocket.bind((host, port))
-
-# queue up to 5 requests
-serversocket.listen(5)
-
-print("Server is listening...")
-
-while True:
-    # establish a connection
-    clientsocket, addr = serversocket.accept()
-    print("Got a connection from %s" % str(addr))
-    currentTime = time.ctime(time.time()) + "\r\n"
-    clientsocket.send(currentTime.encode('ascii'))
-    clientsocket.close()
-    time.sleep(1)
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    s.bind((HOST, PORT))
+    s.listen(1)
+    conn, addr = s.accept()
+    with conn:
+        print(f"Connected by {addr}")
+        while True:
+            data = conn.recv(1024)
+            print(data)
+            if not data:
+                break
+            conn.sendall(data)
