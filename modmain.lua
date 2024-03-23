@@ -112,13 +112,13 @@ function Craft(item)
     local inventory = player.components.inventory
     local recipes = GLOBAL.GetAllRecipes()
     local recipe = recipes[item]
-    if recipe then
-        local ingredients = recipe.ingredients
-        for k, v in pairs(ingredients) do
-            inventory:RemoveItem(GLOBAL.SpawnPrefab(v.type))
-        end
-        inventory:GiveItem(GLOBAL.SpawnPrefab(recipe.product))
+    -- use builder component to craft item
+    local builder = player.components.builder
+    if builder then
+        builder:MakeRecipe(recipe)
     end
+
+
 end
 
 function Wander()
@@ -146,8 +146,6 @@ function GetNearbyEntities()
     return ents
 end
 
-
-
 function PreparePlayerCharacter(player)
     -- local numbertext = Text(GLOBAL.BUTTONFONT, 24, "Test") --Make some text
     -- numbertext:SetColour(1,1,1,1) --Set the colour to white
@@ -166,7 +164,7 @@ function PreparePlayerCharacter(player)
     end)
 
     player:DoPeriodicTask(3, function()
-        Wander()
+        -- Wander()
     end)
 
     player:DoPeriodicTask(1, function()
@@ -198,6 +196,8 @@ function PreparePlayerCharacter(player)
         -- print("NearbyEntities: ", GetNearbyEntities()) -- returns a table
 
         -- print("\n\n\n")
+
+        Craft("axe")
 
     end)
 
