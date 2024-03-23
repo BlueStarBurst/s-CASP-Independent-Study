@@ -1,3 +1,12 @@
+local socket = require("socket")
+host = "localhost"
+port = 12345
+
+print("Attempting connection to host '" ..host.. "' and port " ..port.. "...")
+conn=socket.tcp()
+c = assert(conn.connect(host, port))
+print("Connected! Please type stuff (empty line to stop):")
+
 -- A Don't Starve mod that reads the current state of the game and outputs it to a file. This is a mod for the sCASP project.
 local require = GLOBAL.require
 
@@ -16,7 +25,7 @@ function PreparePlayerCharacter(player)
 
 		print("Player position STARTREADER: ", x, y, z)
 
-        -- local ents = TheSim:FindEntities(x, y, z, 20, {"campfire"})
+        local ents = TheSim:FindEntities(x, y, z, 20, {"campfire"})
         -- player.homefirepit = ents[1]
 
         -- -- Make sure the player is facing it
