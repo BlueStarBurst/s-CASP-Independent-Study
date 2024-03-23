@@ -4,6 +4,8 @@
 local require = GLOBAL.require
 
 local socket = require "socket"
+local json = require "json"
+
 local host = "localhost"
 local port = 12345
 
@@ -23,12 +25,12 @@ print("sCASP reader modmain.lua loaded")
 -- print player coordinates to logs
 
 function SendData(data)
-    print("Sending data to server")
+    -- print("Sending data to server")
     tcp:send(data)
 end
 
 function ReceiveData()
-    print("Receiving data from server")
+    -- print("Receiving data from server")
     local s, status, partial = tcp:receive()
     -- print("Server:", s or partial)
     return s or partial
@@ -100,7 +102,49 @@ function CraftableItems()
     return known_recipes
 end
 
+function Craft(item)
+    if not CanCraft(item) then
+        print("Cannot craft item: ", item)
+        return
+    end
 
+    local player = GLOBAL.GetPlayer()
+    local inventory = player.components.inventory
+    local recipes = GLOBAL.GetAllRecipes()
+    local recipe = recipes[item]
+    if recipe then
+        local ingredients = recipe.ingredients
+        for k, v in pairs(ingredients) do
+            inventory:RemoveItem(GLOBAL.SpawnPrefab(v.type))
+        end
+        inventory:GiveItem(GLOBAL.SpawnPrefab(recipe.product))
+    end
+end
+
+function Wander()
+    local player = GLOBAL.GetPlayer()
+    local x, y, z = player.Transform:GetWorldPosition()
+
+    local dx = math.random(-10, 10)
+    local dz = math.random(-10, 10)
+    -- move 10 units forward
+    player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, nil, GLOBAL.ACTIONS.WALKTO, nil, GLOBAL.Vector3(x + dx, y, z + dz), nil, 0, true), true)
+
+    print("Player position: ", x, y, z)
+end
+
+function GetNearbyEntities()
+    local player = GLOBAL.GetPlayer()
+    local x, y, z = player.Transform:GetWorldPosition()
+    local ents = GLOBAL.TheSim:FindEntities(x, y, z, 10)
+    local ent_str = ""
+    for k, v in pairs(ents) do
+        ent_str = ent_str .. v.prefab .. " "
+    end
+    print("Nearby entities: ", ent_str)
+
+    return ents
+end
 
 
 
@@ -109,7 +153,6 @@ function PreparePlayerCharacter(player)
     -- numbertext:SetColour(1,1,1,1) --Set the colour to white
     -- The player entity isn't quite ready to equip items yet, so wait one frame
     player:DoTaskInTime(0, function()
-
         
         print("Attempting connection to host '" ..host.. "' and port " ..port.. "...")
         tcp:connect(host, port);
@@ -122,9 +165,21 @@ function PreparePlayerCharacter(player)
 
     end)
 
+    player:DoPeriodicTask(3, function()
+        Wander()
+    end)
+
     player:DoPeriodicTask(1, function()
         local playerfacing = player.Transform:GetRotation()
 		local x, y, z = player.Transform:GetWorldPosition()
+
+        print("Health: ", player.components.health:GetDebugString())
+        local ents = TheSim:FindEntities(x,y,z, GLOBAL.TUNING.SANITY_EFFECT_RANGE)
+        for i,ent in ipairs(ents) do
+            for component, _ in pairs(ent.components) do
+                print("Component: ", component)
+            end
+        end
 
         -- send to position to the server
         -- print("Sending player position to server")
@@ -136,12 +191,13 @@ function PreparePlayerCharacter(player)
 
         -- print("\n\n\n")
 
-        print("Time of day: ", GetTimeOfDay()) -- returns a string?
-        print("Inventory: ", GetInventoryItems()) -- returns a table
-        print("CraftableItems: ", CraftableItems()) -- returns a table
-        print("CanCraft(axe): ", CanCraft("axe")) -- returns bool
+        -- print("Time of day: ", GetTimeOfDay()) -- returns a string?
+        -- print("Inventory: ", GetInventoryItems()) -- returns a table
+        -- print("CraftableItems: ", CraftableItems()) -- returns a table
+        -- print("CanCraft(axe): ", CanCraft("axe")) -- returns bool
+        -- print("NearbyEntities: ", GetNearbyEntities()) -- returns a table
 
-        print("\n\n\n")
+        -- print("\n\n\n")
 
     end)
 
