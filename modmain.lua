@@ -207,6 +207,3 @@ function PreparePlayerCharacter(player)
 end
 AddSimPostInit(PreparePlayerCharacter)
 
-
-
-
