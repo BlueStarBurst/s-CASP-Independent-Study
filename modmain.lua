@@ -6,7 +6,7 @@ local require = GLOBAL.require
 local socket = require "socket"
 local json = require "json"
 
-local host = "172.21.48.1"
+local host = "localhost"
 local port = 12345
 
 local tcp = socket.tcp()
@@ -32,7 +32,7 @@ end
 function ReceiveData()
     -- print("Receiving data from server")
     local s, status, partial = tcp:receive()
-    -- print("Server:", s or partial)
+    print("Server:", s or partial)
     return s or partial
 end
 
@@ -59,7 +59,7 @@ function GetInventoryItems()
     for k, v in pairs(items) do
         inv_str = inv_str .. v .. " "
     end
-    print("Inventory: ", inv_str)
+    -- print("Inventory: ", inv_str)
 
     return items
 end
@@ -99,7 +99,7 @@ function CraftableItems()
         count = count + 1
     end
 
-    print("Known recipes: ", known_str)
+    -- print("Known recipes: ", known_str)
 
     return known_recipes
 end
@@ -197,7 +197,7 @@ function PreparePlayerCharacter(player)
         
         -- print("Receiving from server")
 
-        -- print(ReceiveData())
+        print(ReceiveData())
 
         -- print("\n\n\n")
 

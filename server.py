@@ -11,6 +11,10 @@ PORT = 12345  # Port to listen on (non-privileged ports are > 1023)
 
 print("Server started")
 
+# print all the ip addresses of the server
+print("IP addresses of the server")
+print(socket.gethostbyname_ex(socket.gethostname()))
+
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.bind((HOST, PORT))
     while True:
