@@ -6,7 +6,7 @@ local require = GLOBAL.require
 local socket = require "socket"
 local json = require "json"
 
-local host = "localhost"
+local host = "172.21.48.1"
 local port = 12345
 
 local tcp = socket.tcp()
@@ -22,7 +22,7 @@ require "constants"
 
 print("sCASP reader modmain.lua loaded")
 
--- print player coordinates to logs
+-- SERVER FUNCTIONS --
 
 function SendData(data)
     -- print("Sending data to server")
@@ -36,8 +36,10 @@ function ReceiveData()
     return s or partial
 end
 
+-- END SERVER FUNCTIONS --
 
 
+-- ACTIONS --
 
 function GetTimeOfDay()
     local time = GLOBAL.GetClock()
@@ -133,6 +135,11 @@ function Wander()
     print("Player position: ", x, y, z)
 end
 
+function WalkToXYZ(x, y, z)
+    local player = GLOBAL.GetPlayer()
+    
+end
+
 function GetNearbyEntities()
     local player = GLOBAL.GetPlayer()
     local x, y, z = player.Transform:GetWorldPosition()
@@ -145,6 +152,11 @@ function GetNearbyEntities()
 
     return ents
 end
+
+-- END ACTIONS --
+
+
+-- PLAYER --
 
 function PreparePlayerCharacter(player)
     -- local numbertext = Text(GLOBAL.BUTTONFONT, 24, "Test") --Make some text
@@ -206,4 +218,6 @@ function PreparePlayerCharacter(player)
     -- GLOBAL.c_select(player)
 end
 AddSimPostInit(PreparePlayerCharacter)
+
+-- END PLAYER --
 
