@@ -336,6 +336,37 @@ function DropStack(item_name, amount)
     player.components.locomotor:PushAction(action, true)
 end
 
+function CutDownTree()
+    local player = GLOBAL.GetPlayer()
+    local x, y, z = player.Transform:GetWorldPosition()
+
+    -- if player has axe equipped, chop down tree
+    local inventory = player.components.inventory
+    local slot = 0
+    for k, v in pairs(inventory.equipslots) do
+        if v and v.prefab == "axe" then
+            slot = k
+            break
+        end
+    end
+
+    if slot == 0 then
+        return
+    end
+
+    -- equip axe
+    player.components.inventory:EquipAction(inventory.equipslots[slot])
+
+
+    local ents = GLOBAL.TheSim:FindEntities(x, y, z, 10)
+    for k, v in pairs(ents) do
+        if v.prefab == "evergreen" then
+            player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, v, GLOBAL.ACTIONS.CHOP, nil, nil, nil, 0,
+                nil, 2), true)
+        end
+    end
+end
+
 -- END ACTIONS --
 
 -- PLAYER --
@@ -361,95 +392,84 @@ function PreparePlayerCharacter(player)
         -- Wander()
     end)
 
-    player:DoPeriodicTask(1, function()
-        local playerfacing = player.Transform:GetRotation()
-        local x, y, z = player.Transform:GetWorldPosition()
+    player:DoTaskInTime(1, function()
 
-        print("Health: ", player.components.health:GetDebugString())
+        while true do
+            local playerfacing = player.Transform:GetRotation()
+            local x, y, z = player.Transform:GetWorldPosition()
 
-        -- local ents = TheSim:FindEntities(x,y,z, GLOBAL.TUNING.SANITY_EFFECT_RANGE)
-        -- for i,ent in ipairs(ents) do
-        --     for component, _ in pairs(ent.components) do
-        --         print("Component: ", component)
-        --     end
-        -- end
+            -- print("Health: ", player.components.health:GetDebugString())
 
-        -- WalkToEntity("flower")
-        -- PickEntity("grass")
+            
 
-        -- send to position to the server
-        -- print("Sending player position to server")
+            -- GetDistanceFrom("researchlab") -- You need to be closer than 4 units to use it
+            -- PlayerSleep()
+            -- Cook("meat")
+            -- Craft("campfire")
+            -- DropStack("cutgrass")
+            -- Craft("axe")
 
-        -- SendData("Player position:   " .. x .. "   " .. y .. "   " .. z .. "\n")
+            -- print(player.components.health:GetDebugString())
+            -- print(player.components.hunger:GetDebugString())
+            -- print(player.components.sanity:GetDebugString())
+            
 
-        -- print("Receiving from server")
+            local tbl = {
+                health = player.components.health:GetDebugString(),
+                hunger = player.components.hunger:GetDebugString(),
+                sanity = player.components.sanity:GetDebugString(),
+            
+                position = {
+                    x = x,
+                    y = y,
+                    z = z
+                },
+            
+                inventory = GetInventoryItems(),
+                equipped = {},
+                biome = "",
+                season = "",
+                timeOfDay = GetTimeOfDay(),
+                -- availableRecipes = CraftableItems(),
+                entitiesOnScreen = GetParsedEntities(10),
+                -- entitiesOnMap = GetParsedEntities(100),
+            }
 
-        -- print(ReceiveData())
+            local str = json.encode(tbl, {
+                indent = true
+            })
 
-        -- print("\n\n\n")
+            -- print(str)
 
-        -- print("Time of day: ", GetTimeOfDay()) -- returns a string?
-        -- print("Inventory: ", GetInventoryItems()) -- returns a table
-        -- print("CraftableItems: ", CraftableItems()) -- returns a table
-        -- print out craftable items
+            SendData(str)
 
-        -- for k, v in pairs(CraftableItems()) do
-        --     local ingredients = ""
-        --     for i, j in pairs(v) do
-        --         ingredients = ingredients .. j.type .. " " .. j.amount .. " "
-        --     end
-        --     print(k, ingredients)
-        -- end
+            local data = ReceiveData()
 
-        -- print("CanCraft(axe): ", CanCraft("axe")) -- returns bool
-        -- print("NearbyEntities: ", GetNearbyEntities()) -- returns a table
-        -- print out nearby entities
-        -- for k, v in pairs(GetNearbyEntities()) do
-        --     print(v.prefab)
-        -- end
-        -- print("\n\n\n")
-
-        -- GetDistanceFrom("researchlab") -- You need to be closer than 4 units to use it
-        -- PlayerSleep()
-        -- Cook("meat")
-        -- Craft("campfire")
-        -- DropStack("cutgrass")
-        -- Craft("axe")
-
-        print(player.components.health:GetDebugString())
-        print(player.components.hunger:GetDebugString())
-        print(player.components.sanity:GetDebugString())
-        
-
-        local tbl = {
-            health = player.components.health:GetDebugString(),
-            hunger = player.components.hunger:GetDebugString(),
-            sanity = player.components.sanity:GetDebugString(),
-        
-            position = {
-                x = x,
-                y = y,
-                z = z
-            },
-        
-            inventory = GetInventoryItems(),
-            equipped = {},
-            biome = "",
-            season = "",
-            timeOfDay = GetTimeOfDay(),
-            -- availableRecipes = CraftableItems(),
-            entitiesOnScreen = GetParsedEntities(10),
-            -- entitiesOnMap = GetParsedEntities(100),
-        }
-
-        local str = json.encode(tbl, {
-            indent = true
-        })
-
-        -- print(str)
-
-        SendData(str)
-
+            if data then
+                local tbl = dkjson.decode(data)
+                if tbl then
+                    for k, v in pairs(tbl) do
+                        if k == "action" then
+                            if v == "walk" then
+                                Wander()
+                            elseif v == "pick" then
+                                PickEntity("rabbit")
+                            elseif v == "drop" then
+                                DropItem("cutgrass")
+                            elseif v == "craft" then
+                                Craft("axe")
+                            elseif v == "cook" then
+                                Cook("meat")
+                            elseif v == "sleep" then
+                                PlayerSleep()
+                            elseif v == "chop" then
+                                CutDownTree()
+                            end
+                        end
+                    end
+                end
+            end
+        end
     end)
 
     -- debugging help
