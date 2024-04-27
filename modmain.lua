@@ -20,6 +20,8 @@ print("sCASP reader modmain.lua loaded")
 
 -- SERVER FUNCTIONS --
 
+local currentAction = nil
+
 function SendData(data)
     -- print("Sending data to server")
     tcp:send(data)
@@ -139,6 +141,12 @@ function Craft(item)
                         else
                             Wander()
                         end
+                    elseif ingredient == "cutgrass" then
+                        if PickEntity("grass") then
+                            return true
+                        else
+                            Wander()
+                        end
                     else
                         if PickUpEntity(ingredient) then
                             return true
@@ -169,6 +177,9 @@ function Craft(item)
     return true
 end
 
+
+local prev_angle = 0
+
 function WalkToXYZ(x, y, z)
     local player = GLOBAL.GetPlayer()
 
@@ -176,10 +187,15 @@ function WalkToXYZ(x, y, z)
 
     player.components.locomotor:PushAction(buffered, true)
 
+    -- on success, clear the action
+    buffered:AddSuccessAction(function()
+        currentAction = nil
+    end)
+
     player:DoTaskInTime(5, function()
         if player.components.locomotor.bufferedaction == buffered then
             player.components.locomotor:Clear()
-            prev_angle = prev_angle + math.random(-1, 1) * math.pi / 2
+            prev_angle = prev_angle + math.pi / 2
         end
     end)
 
@@ -187,7 +203,6 @@ function WalkToXYZ(x, y, z)
 
 end
 
-local prev_angle = 0
 
 function WalkInAngle(angle, distance)
     local player = GLOBAL.GetPlayer()
@@ -207,10 +222,17 @@ end
 
 function Wander()
     local player = GLOBAL.GetPlayer()
-    
-    local angle = prev_angle + math.random(-1, 1) * math.pi / 6
 
-    WalkInAngle(math.random(0, 2 * math.pi), 10)
+    if player.components.locomotor:HasDestination() then
+        isBusy = true
+        print("Player is busy")
+        return
+    end
+    
+    local angle = prev_angle + math.random(-1, 1) * math.pi / 3
+    prev_angle = angle
+
+    WalkInAngle(angle, 10)
 
     print("WANDERING")
 end
@@ -218,7 +240,7 @@ end
 function GetNearbyEntities(distance)
     local player = GLOBAL.GetPlayer()
     local x, y, z = player.Transform:GetWorldPosition()
-    local ents = GLOBAL.TheSim:FindEntities(x, y, z, distance or 30)
+    local ents = GLOBAL.TheSim:FindEntities(x, y, z, distance or 10)
     local ent_str = ""
     for k, v in pairs(ents) do
         ent_str = ent_str .. v.prefab .. " "
@@ -552,11 +574,7 @@ function PreparePlayerCharacter(player)
     player:DoPeriodicTask(1, function()
 
         -- if locomotor is currently performing an action, don't read from the server
-        if player.components.locomotor:HasDestination() then
-            isBusy = true
-            print("Player is busy")
-            return
-        end
+        
         local playerfacing = player.Transform:GetRotation()
         local x, y, z = player.Transform:GetWorldPosition()
 
@@ -609,7 +627,10 @@ function PreparePlayerCharacter(player)
 
         local data = ReceiveData()
 
-
+        if currentAction then
+            print("Current action: ", currentAction)
+            return
+        end
 
         if data then
             local tbl = dkjson.decode(data)
@@ -629,7 +650,8 @@ function PreparePlayerCharacter(player)
                         elseif v == "sleep" then
                             PlayerSleep()
                         elseif v == "chop" then
-                            CutDownTree()
+                            -- CutDownTree()
+                            Craft("campfire")
                         end
                     end
                 end
