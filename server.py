@@ -4,28 +4,48 @@
 
 import socket
 import time
+import json
 
-# create a socket object
-serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-# get local machine name
-host = socket.gethostname()
+HOST = "127.0.0.1"  # Standard loopback interface address (localhost)
+PORT = 12345  # Port to listen on (non-privileged ports are > 1023)
 
-port = 12345
+print("Server started")
 
-# bind to the port
-serversocket.bind((host, port))
+# print all the ip addresses of the server
+print("IP addresses of the server")
+print(socket.gethostbyname_ex(socket.gethostname()))
 
-# queue up to 5 requests
-serversocket.listen(5)
-
-print("Server is listening...")
-
-while True:
-    # establish a connection
-    clientsocket, addr = serversocket.accept()
-    print("Got a connection from %s" % str(addr))
-    currentTime = time.ctime(time.time()) + "\r\n"
-    clientsocket.send(currentTime.encode('ascii'))
-    clientsocket.close()
-    time.sleep(1)
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    s.bind((HOST, PORT))
+    while True:
+        s.listen()
+        conn, addr = s.accept()
+        with conn:
+            print(f"Connected by {addr}")
+            while True:
+                data = conn.recv(1024*10000)
+                print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
+                # decode the data from json
+                data = data.decode("utf-8")
+                print(data)
+                
+                with open("data.json", "w") as f:
+                    f.write(data)
+                
+                # # print out every key value pair on a new line
+                # for key, value in data.items():
+                #     print(key, ":", value)
+                
+                
+                
+                if not data:
+                    break
+                
+                
+                # send json data of action: "chop" to the client
+                data = json.dumps({"action": "chop"})
+                # encode to bytes
+                data = data.encode("utf-8")
+                
+                conn.sendall(data)
