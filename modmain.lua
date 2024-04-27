@@ -131,25 +131,25 @@ function Craft(item)
                 if count < amount then
                     print("Missing ingredient: ", ingredient, " amount: ", amount - count)
                     -- find entity with the ingredient
-                    local entity = GetEntity(ingredient)
-                    if entity then
-                        if ingredient == "twigs" then
-                            if PickEntity("sapling") then
-                                return true
-                            else
-                                Wander()
-                            end
+                    
+                    
+                    if ingredient == "twigs" then
+                        if PickEntity("sapling") then
+                            return true
                         else
-                            if PickUpEntity(ingredient) then
-                                return true
-                            else
-                                Wander()
-                            end
+                            Wander()
                         end
                     else
-                        print("Ingredient: ", ingredient, " amount: ", amount)
-                        Wander()
+                        if PickUpEntity(ingredient) then
+                            return true
+                        else
+                            Wander()
+                        end
                     end
+                    -- else
+                    --     print("Ingredient: ", ingredient, " amount: ", amount)
+                    --     Wander()
+                    -- end
                 end
             end
         end
@@ -171,8 +171,30 @@ end
 
 function WalkToXYZ(x, y, z)
     local player = GLOBAL.GetPlayer()
-    player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, nil, GLOBAL.ACTIONS.WALKTO, nil,
-        GLOBAL.Vector3(x, y, z), nil, 0, true), true)
+
+    local buffered = GLOBAL.BufferedAction(player, nil, GLOBAL.ACTIONS.WALKTO, nil, GLOBAL.Vector3(x, y, z), nil, 0, true)
+
+    player.components.locomotor:PushAction(buffered, true)
+
+    player:DoTaskInTime(5, function()
+        if player.components.locomotor.bufferedaction == buffered then
+            player.components.locomotor:Clear()
+            prev_angle = prev_angle + math.random(-1, 1) * math.pi / 2
+        end
+    end)
+
+    
+
+end
+
+local prev_angle = 0
+
+function WalkInAngle(angle, distance)
+    local player = GLOBAL.GetPlayer()
+    local x, y, z = player.Transform:GetWorldPosition()
+    local dx = math.cos(angle) * distance
+    local dz = math.sin(angle) * distance
+    WalkToXYZ(x + dx, y, z + dz)
 end
 
 function WalkToEntity(entity_name)
@@ -185,12 +207,10 @@ end
 
 function Wander()
     local player = GLOBAL.GetPlayer()
-    local x, y, z = player.Transform:GetWorldPosition()
+    
+    local angle = prev_angle + math.random(-1, 1) * math.pi / 6
 
-    local dx = math.random(-10, 10)
-    local dz = math.random(-10, 10)
-    -- move 10 units forward
-    WalkToXYZ(x + dx, y, z + dz)
+    WalkInAngle(math.random(0, 2 * math.pi), 10)
 
     print("WANDERING")
 end
@@ -198,7 +218,7 @@ end
 function GetNearbyEntities(distance)
     local player = GLOBAL.GetPlayer()
     local x, y, z = player.Transform:GetWorldPosition()
-    local ents = GLOBAL.TheSim:FindEntities(x, y, z, distance or 10)
+    local ents = GLOBAL.TheSim:FindEntities(x, y, z, distance or 30)
     local ent_str = ""
     for k, v in pairs(ents) do
         ent_str = ent_str .. v.prefab .. " "
@@ -495,6 +515,8 @@ function CutDownTree()
     if closest then
         player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, closest, GLOBAL.ACTIONS.CHOP, nil, nil, nil,
             0, nil, 2), true)
+    else
+        Wander()
     end
 end
 
@@ -529,84 +551,91 @@ function PreparePlayerCharacter(player)
 
     player:DoPeriodicTask(1, function()
 
-        if not isBusy then
+        -- if locomotor is currently performing an action, don't read from the server
+        if player.components.locomotor:HasDestination() then
             isBusy = true
-            local playerfacing = player.Transform:GetRotation()
-            local x, y, z = player.Transform:GetWorldPosition()
+            print("Player is busy")
+            return
+        end
+        local playerfacing = player.Transform:GetRotation()
+        local x, y, z = player.Transform:GetWorldPosition()
 
-            -- print("Health: ", player.components.health:GetDebugString())
+        -- print("Health: ", player.components.health:GetDebugString())
 
-            
+        
 
-            -- GetDistanceFrom("researchlab") -- You need to be closer than 4 units to use it
-            -- PlayerSleep()
-            -- Cook("meat")
-            -- Craft("campfire")
-            -- DropStack("cutgrass")
-            -- Craft("axe")
+        -- GetDistanceFrom("researchlab") -- You need to be closer than 4 units to use it
+        -- PlayerSleep()
+        -- Cook("meat")
+        -- Craft("campfire")
+        -- DropStack("cutgrass")
+        -- Craft("axe")
 
-            -- print(player.components.health:GetDebugString())
-            -- print(player.components.hunger:GetDebugString())
-            -- print(player.components.sanity:GetDebugString())
-            
+        -- print(player.components.health:GetDebugString())
+        -- print(player.components.hunger:GetDebugString())
+        -- print(player.components.sanity:GetDebugString())
+        
 
-            local tbl = {
-                health = player.components.health:GetDebugString(),
-                hunger = player.components.hunger:GetDebugString(),
-                sanity = player.components.sanity:GetDebugString(),
-            
-                position = {
-                    x = x,
-                    y = y,
-                    z = z
-                },
-            
-                inventory = GetInventoryItems(),
-                equipped = {},
-                biome = "",
-                season = "",
-                timeOfDay = GetTimeOfDay(),
-                -- availableRecipes = CraftableItems(),
-                entitiesOnScreen = GetParsedEntities(10),
-                -- entitiesOnMap = GetParsedEntities(100),
-            }
+        local tbl = {
+            health = player.components.health:GetDebugString(),
+            hunger = player.components.hunger:GetDebugString(),
+            sanity = player.components.sanity:GetDebugString(),
+        
+            position = {
+                x = x,
+                y = y,
+                z = z
+            },
+        
+            inventory = GetInventoryItems(),
+            equipped = {},
+            biome = "",
+            season = "",
+            timeOfDay = GetTimeOfDay(),
+            -- availableRecipes = CraftableItems(),
+            entitiesOnScreen = GetParsedEntities(10),
+            -- entitiesOnMap = GetParsedEntities(100),
+        }
 
-            local str = json.encode(tbl, {
-                indent = true
-            })
+        local str = json.encode(tbl, {
+            indent = true
+        })
 
-            -- print(str)
+        -- print(str)
 
-            SendData(str)
+        SendData(str)
 
-            local data = ReceiveData()
+        
 
-            if data then
-                local tbl = dkjson.decode(data)
-                if tbl then
-                    for k, v in pairs(tbl) do
-                        if k == "action" then
-                            if v == "walk" then
-                                Wander()
-                            elseif v == "pick" then
-                                PickEntity("rabbit")
-                            elseif v == "drop" then
-                                DropItem("cutgrass")
-                            elseif v == "craft" then
-                                Craft("axe")
-                            elseif v == "cook" then
-                                Cook("meat")
-                            elseif v == "sleep" then
-                                PlayerSleep()
-                            elseif v == "chop" then
-                                CutDownTree()
-                            end
+        local data = ReceiveData()
+
+
+
+        if data then
+            local tbl = dkjson.decode(data)
+            if tbl then
+                for k, v in pairs(tbl) do
+                    if k == "action" then
+                        if v == "walk" then
+                            Wander()
+                        elseif v == "pick" then
+                            PickEntity("rabbit")
+                        elseif v == "drop" then
+                            DropItem("cutgrass")
+                        elseif v == "craft" then
+                            Craft("axe")
+                        elseif v == "cook" then
+                            Cook("meat")
+                        elseif v == "sleep" then
+                            PlayerSleep()
+                        elseif v == "chop" then
+                            CutDownTree()
                         end
                     end
                 end
             end
-            isBusy = false
         end
+        
     end)
 
     -- debugging help
