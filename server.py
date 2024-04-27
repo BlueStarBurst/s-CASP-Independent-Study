@@ -41,4 +41,11 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 
                 if not data:
                     break
-                # conn.sendall(data)
+                
+                
+                # send json data of action: "chop" to the client
+                data = json.dumps({"action": "chop"})
+                # encode to bytes
+                data = data.encode("utf-8")
+                
+                conn.sendall(data)
