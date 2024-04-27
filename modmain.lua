@@ -116,7 +116,45 @@ end
 function Craft(item)
     if not CanCraft(item) then
         print("Cannot craft item: ", item)
-        return
+
+        -- get each ingredient in the recipe
+        local player = GLOBAL.GetPlayer()
+        local inventory = player.components.inventory
+        local recipes = GLOBAL.GetAllRecipes()
+        local recipe = recipes[item]
+        if recipe then
+            local ingredients = recipe.ingredients
+            for k, v in pairs(ingredients) do
+                local ingredient = v.type
+                local amount = v.amount
+                local count = inventory:Count(ingredient, true)
+                if count < amount then
+                    print("Missing ingredient: ", ingredient, " amount: ", amount - count)
+                    -- find entity with the ingredient
+                    local entity = GetEntity(ingredient)
+                    if entity then
+                        if ingredient == "twigs" then
+                            if PickEntity("sapling") then
+                                return true
+                            else
+                                Wander()
+                            end
+                        else
+                            if PickUpEntity(ingredient) then
+                                return true
+                            else
+                                Wander()
+                            end
+                        end
+                    else
+                        print("Ingredient: ", ingredient, " amount: ", amount)
+                        Wander()
+                    end
+                end
+            end
+        end
+
+        return false
     end
 
     local player = GLOBAL.GetPlayer()
@@ -128,7 +166,7 @@ function Craft(item)
     if builder then
         builder:MakeRecipe(recipe)
     end
-
+    return true
 end
 
 function WalkToXYZ(x, y, z)
@@ -154,7 +192,7 @@ function Wander()
     -- move 10 units forward
     WalkToXYZ(x + dx, y, z + dz)
 
-    print("Player position: ", x, y, z)
+    print("WANDERING")
 end
 
 function GetNearbyEntities(distance)
@@ -215,8 +253,47 @@ function PickEntity(entity_name)
         if entity.components.pickable and entity.components.pickable:CanBePicked() then
             player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, entity, GLOBAL.ACTIONS.PICK, nil, nil,
                 nil, 0, nil, 2), true)
+            return true
         end
     end
+    return false
+end
+
+function PickUpEntity(entity_name) -- pick up entity from the ground
+    local entity = GetEntity(entity_name)
+    if entity then
+
+        print("Picking up entity: ", entity_name)
+
+        -- print all components of the entity
+        local components_string = ""
+        for k, v in pairs(entity.components) do
+            components_string = components_string .. k .. " "
+        end
+        print("Components: ", components_string)
+
+        -- BufferedAction walk to the entity and pick it up
+        local player = GLOBAL.GetPlayer()
+
+        -- walk to the entity
+        local x, y, z = entity.Transform:GetWorldPosition()
+        -- player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, nil, GLOBAL.ACTIONS.WALKTO, nil,
+        --     GLOBAL.Vector3(x, y, z), nil, 0, true), true)
+
+
+        player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, entity, GLOBAL.ACTIONS.PICKUP, nil, nil,
+            nil, 0, nil, 2), true)
+
+        return true
+
+        -- sleep for 2 seconds
+        -- GLOBAL.Sleep(2)
+
+
+
+
+    end
+    return false
 end
 
 function PlayerSleep()
@@ -278,10 +355,31 @@ end
 
 function GetEntity(name)
     local ents = GetNearbyEntities()
+    local ent = nil
+    local dist = 1000
+    local player = GLOBAL.GetPlayer()
+    local x, y, z = player.Transform:GetWorldPosition()
     for k, v in pairs(ents) do
         if v.prefab == name then
-            return v
+
+            -- not in limbo
+            if not v:IsInLimbo() then
+                
+            
+            
+                local ex, ey, ez = v.Transform:GetWorldPosition()
+                local d = math.sqrt((x - ex) ^ 2 + (y - ey) ^ 2 + (z - ez) ^ 2)
+                if d < dist then
+                    dist = d
+                    ent = v
+                end
+            end
         end
+    end
+
+    if ent then
+        print("Found entity: ", name, " at distance: ", dist)
+        return ent
     end
     return nil
 end
@@ -336,13 +434,28 @@ function DropStack(item_name, amount)
     player.components.locomotor:PushAction(action, true)
 end
 
+function MakeAxe()
+    return Craft("axe")
+end
+
 function CutDownTree()
     local player = GLOBAL.GetPlayer()
     local x, y, z = player.Transform:GetWorldPosition()
 
+    -- if logs or pinecones are on the ground, pick them up
+    local ents = GLOBAL.TheSim:FindEntities(x, y, z, 10)
+    for k, v in pairs(ents) do
+        if v.prefab == "log" or v.prefab == "pinecone" then
+            if PickUpEntity(v.prefab) == true then
+                return
+            end
+        end
+    end
+
+
     -- if player has axe equipped, chop down tree
     local inventory = player.components.inventory
-    local slot = 0
+    local slot = -1
     for k, v in pairs(inventory.equipslots) do
         if v and v.prefab == "axe" then
             slot = k
@@ -350,20 +463,38 @@ function CutDownTree()
         end
     end
 
-    if slot == 0 then
+    if slot == -1 then
+        -- if no axe, craft one
+        MakeAxe()
         return
+
     end
 
-    -- equip axe
-    player.components.inventory:EquipAction(inventory.equipslots[slot])
+    -- if axe is not equipped, equip it
+    if not inventory.equipslots[slot] then
+        player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, nil, GLOBAL.ACTIONS.EQUIP, inventory.itemslots[slot], nil, nil, 0, nil, 2), true)
+    end
 
 
     local ents = GLOBAL.TheSim:FindEntities(x, y, z, 10)
+    local closest = nil
+    local dist = 1000
     for k, v in pairs(ents) do
-        if v.prefab == "evergreen" then
-            player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, v, GLOBAL.ACTIONS.CHOP, nil, nil, nil, 0,
-                nil, 2), true)
+        -- if no stump, chop tree
+        if v.prefab == "evergreen" and not v:HasTag("stump") then
+            local ex, ey, ez = v.Transform:GetWorldPosition()
+            local d = math.sqrt((x - ex) ^ 2 + (y - ey) ^ 2 + (z - ez) ^ 2)
+            if d < dist then
+                dist = d
+                closest = v
+            end
+
         end
+    end
+
+    if closest then
+        player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, closest, GLOBAL.ACTIONS.CHOP, nil, nil, nil,
+            0, nil, 2), true)
     end
 end
 
@@ -392,9 +523,14 @@ function PreparePlayerCharacter(player)
         -- Wander()
     end)
 
-    player:DoTaskInTime(1, function()
+    local isBusy = false
 
-        while true do
+    
+
+    player:DoPeriodicTask(1, function()
+
+        if not isBusy then
+            isBusy = true
             local playerfacing = player.Transform:GetRotation()
             local x, y, z = player.Transform:GetWorldPosition()
 
@@ -469,6 +605,7 @@ function PreparePlayerCharacter(player)
                     end
                 end
             end
+            isBusy = false
         end
     end)
 
