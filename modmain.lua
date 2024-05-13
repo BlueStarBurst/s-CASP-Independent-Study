@@ -245,33 +245,45 @@ function GetNearbyEntities(distance)
     for k, v in pairs(ents) do
         ent_str = ent_str .. v.prefab .. " "
     end
-    -- print("Nearby entities: ", ent_str)
 
     return ents
+end
+
+local function Entity(inst, v)
+	local d = {}
+
+	d.GUID = v.GUID
+	d.Prefab = v.prefab
+	d.Quantity = v.components.stackable ~= nil and v.components.stackable:StackSize() or 1
+
+	d.Collectable = v:HasTag("pickable") -- PICK
+	d.Cooker = v:HasTag("cooker")
+	d.Cookable = v:HasTag("cookable")
+	d.Edible = inst.components.eater:CanEat(v)
+	d.Equippable = v:HasTag("_equippable")
+	d.Fuel = v:HasTag("BURNABLE_fuel")
+	d.Fueled = v:HasTag("BURNABLE_fueled")
+	d.Grower = v:HasTag("grower")
+	d.Harvestable = v:HasTag("readyforharvest") or (v.components.stewer and v.components.stewer:IsDone())
+	d.Pickable = v.components.inventoryitem and v.components.inventoryitem.canbepickedup and not v:HasTag("heavy") -- PICKUP
+	d.Stewer= v:HasTag("stewer")
+
+	d.Choppable = v:HasTag("CHOP_workable")
+	d.Diggable = v:HasTag("DIG_workable")
+	d.Hammerable = v:HasTag("HAMMER_workable")
+	d.Mineable = v:HasTag("MINE_workable")
+
+	--d.X, d.Y, d.Z = v.Transform:GetWorldPosition() --Useless for now?
+	return d
 end
 
 function GetParsedEntities(distance)
     local entities = GetNearbyEntities(distance)
     local parsed_entities = {}
-    -- parse entities into {"Rabbit": {"position": {"x": 0, "y": 0, "z": 0}, "components": ["Cookable", "Edible", "Dead"]}}
+    
     for k, v in pairs(entities) do
-        -- local components = {}
-        -- for k, v in pairs(v.components) do
-        --     table.insert(components, k)
-        -- end
-
-        -- local str = json.encode(components, {
-        --     indent = true
-        -- })
-        local X, Y, Z = v.Transform:GetWorldPosition()
-        parsed_entities[v.prefab] = {
-            position = {
-                x = X,
-                y = Y,
-                z = Z
-            },
-            -- components = str
-        }
+        local entity = Entity(GLOBAL.GetPlayer(), v)
+        parsed_entities[entity.Prefab] = entity
     end
     return parsed_entities
 end
