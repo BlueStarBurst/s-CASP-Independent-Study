@@ -85,7 +85,7 @@ function GetInventoryItems()
     return items
 end
 
-function CanCraft(item)
+function CanBuild(item)
     local player = GLOBAL.GetPlayer()
     local inventory = player.components.inventory
     local recipes = GLOBAL.GetAllRecipes()
@@ -102,7 +102,7 @@ function CanCraft(item)
     return false
 end
 
-function CraftableItems()
+function BuildableItems()
     -- get known recipes and put them in a table {axe: [(twigs, 2), (flint, 1)], ...}
     local recipes = GLOBAL.GetAllRecipes()
     local known_recipes = {}
@@ -115,8 +115,8 @@ function CraftableItems()
     -- return known_recipes
 end
 
-function Craft(item)
-    if not CanCraft(item) then
+function Build(item)
+    if not CanBuild(item) then
         print("Cannot craft item: ", item)
 
         -- get each ingredient in the recipe
@@ -489,7 +489,7 @@ function DropStack(item_name, amount)
 end
 
 function MakeAxe()
-    return Craft("axe")
+    return Build("axe")
 end
 
 function CutDownTree()
@@ -597,9 +597,9 @@ function PreparePlayerCharacter(player)
         -- GetDistanceFrom("researchlab") -- You need to be closer than 4 units to use it
         -- PlayerSleep()
         -- Cook("meat")
-        -- Craft("campfire")
+        -- Build("campfire")
         -- DropStack("cutgrass")
-        -- Craft("axe")
+        -- Build("axe")
 
         -- print(player.components.health:GetDebugString())
         -- print(player.components.hunger:GetDebugString())
@@ -622,7 +622,7 @@ function PreparePlayerCharacter(player)
             biome = "",
             season = "",
             timeOfDay = GetTimeOfDay(),
-            -- availableRecipes = CraftableItems(),
+            -- availableRecipes = BuildableItems(),
             entitiesOnScreen = GetParsedEntities(10),
             -- entitiesOnMap = GetParsedEntities(100),
         }
@@ -656,14 +656,14 @@ function PreparePlayerCharacter(player)
                         elseif v == "drop" then
                             DropItem("cutgrass")
                         elseif v == "craft" then
-                            Craft("axe")
+                            Build("axe")
                         elseif v == "cook" then
                             Cook("meat")
                         elseif v == "sleep" then
                             PlayerSleep()
                         elseif v == "chop" then
                             -- CutDownTree()
-                            Craft("campfire")
+                            Build("campfire")
                         end
                     end
                 end
