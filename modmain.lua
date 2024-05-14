@@ -1,3 +1,6 @@
+local DISTANCE = 20
+
+
 -- A Don't Starve mod that reads the current state of the game and outputs it to a file. This is a mod for the sCASP project.
 local require = GLOBAL.require
 
@@ -71,19 +74,7 @@ function GetTimeOfDay()
     }
 end
 
-function GetInventoryItems()
 
-    -- return {"item" : "amount"}
-    local player = GLOBAL.GetPlayer()
-    local inventory = player.components.inventory
-    local items = {}
-    for k, v in pairs(inventory.itemslots) do
-        if v then
-            items[v.prefab] = inventory:Count(v.prefab, true)
-        end
-    end
-    return items
-end
 
 function CanBuild(item)
     local player = GLOBAL.GetPlayer()
@@ -111,7 +102,6 @@ function BuildableItems()
         local recipe_name = v.name
         known_recipes[recipe_name] = 0
     end
-
     -- return known_recipes
 end
 
@@ -237,17 +227,7 @@ function Wander()
     print("WANDERING")
 end
 
-function GetNearbyEntities(distance)
-    local player = GLOBAL.GetPlayer()
-    local x, y, z = player.Transform:GetWorldPosition()
-    local ents = GLOBAL.TheSim:FindEntities(x, y, z, distance or 10)
-    local ent_str = ""
-    for k, v in pairs(ents) do
-        ent_str = ent_str .. v.prefab .. " "
-    end
 
-    return ents
-end
 
 local function Entity(inst, v)
 	local d = {}
@@ -256,7 +236,7 @@ local function Entity(inst, v)
 	d.Prefab = v.prefab
 	d.Quantity = v.components.stackable ~= nil and v.components.stackable:StackSize() or 1
 
-	d.Collectable = v:HasTag("pickable") -- PICK
+	d.Collectable = v:HasTag("pickable") 
 	d.Cooker = v:HasTag("cooker")
 	d.Cookable = v:HasTag("cookable")
 	d.Edible = inst.components.eater:CanEat(v)
@@ -277,16 +257,41 @@ local function Entity(inst, v)
 	return d
 end
 
-function GetParsedEntities(distance)
-    local entities = GetNearbyEntities(distance)
-    local parsed_entities = {}
-    
-    for k, v in pairs(entities) do
-        local entity = Entity(GLOBAL.GetPlayer(), v)
-        parsed_entities[entity.Prefab] = entity
+
+function GetInventoryItems()
+
+    local player = GLOBAL.GetPlayer()
+    local inventory = player.components.inventory
+    local items = {}
+
+    for k, v in pairs(inventory.itemslots) do
+        local entity = Entity(player, v)
+        table.insert(items, entity)
     end
-    return parsed_entities
+    return items
 end
+
+function GetNearbyEntities(distance)
+    local player = GLOBAL.GetPlayer()
+    local x, y, z = player.Transform:GetWorldPosition()
+    
+    local TAGS = nil
+    local EXCLUDE_TAGS = {"INLIMBO", "NOCLICK", "CLASSIFIED", "FX"}
+    local ONE_OF_TAGS = nil
+
+    local ents = GLOBAL.TheSim:FindEntities(x, y, z, distance, TAGS, EXCLUDE_TAGS, ONE_OF_TAGS)
+    local parsed_ents = {}
+
+    for k, v in pairs(entities) do
+        if player.GUID ~= v.GUID then
+            local entity = Entity(player, v)
+            table.insert(parsed_ents, entity)
+        end
+    end
+    return parsed_ents
+    return ents
+end
+
 
 function PickEntity(entity_name)
     local entity = GetEntity(entity_name)
@@ -332,7 +337,7 @@ function PickUpEntity(entity_name) -- pick up entity from the ground
         -- walk to the entity
         local x, y, z = entity.Transform:GetWorldPosition()
         -- player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, nil, GLOBAL.ACTIONS.WALKTO, nil,
-        --     GLOBAL.Vector3(x, y, z), nil, 0, true), true)
+        -- GLOBAL.Vector3(x, y, z), nil, 0, true), true)
 
 
         player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, entity, GLOBAL.ACTIONS.PICKUP, nil, nil,
@@ -354,7 +359,7 @@ function PlayerSleep()
     local player = GLOBAL.GetPlayer()
 
     -- find entity with sleepingbag component
-    local entities = GetNearbyEntities()
+    local entities = GetNearbyEntities(DISTNACE)
     local entity = nil
     for k, v in pairs(entities) do
         if v.components.sleepingbag then
@@ -383,7 +388,7 @@ function Cook(item)
             -- buffered action
             print("Cooking item: ", item, k)
 
-            local entities = GetNearbyEntities()
+            local entities = GetNearbyEntities(DISTANCE)
             local entity = nil
             for k, v in pairs(entities) do
                 if v.components.cooker then
@@ -408,7 +413,7 @@ function Cook(item)
 end
 
 function GetEntity(name)
-    local ents = GetNearbyEntities()
+    local ents = GetNearbyEntities(DISTANCE)
     local ent = nil
     local dist = 1000
     local player = GLOBAL.GetPlayer()
@@ -419,8 +424,6 @@ function GetEntity(name)
             -- not in limbo
             if not v:IsInLimbo() then
                 
-            
-            
                 local ex, ey, ez = v.Transform:GetWorldPosition()
                 local d = math.sqrt((x - ex) ^ 2 + (y - ey) ^ 2 + (z - ez) ^ 2)
                 if d < dist then
@@ -623,8 +626,7 @@ function PreparePlayerCharacter(player)
             season = "",
             timeOfDay = GetTimeOfDay(),
             -- availableRecipes = BuildableItems(),
-            entitiesOnScreen = GetParsedEntities(10),
-            -- entitiesOnMap = GetParsedEntities(100),
+            entitiesOnScreen = GetNearbyEntities(DISTANCE),
         }
 
         local str = json.encode(tbl, {
