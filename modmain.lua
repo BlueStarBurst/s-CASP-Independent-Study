@@ -280,8 +280,13 @@ function GetNearbyEntities(distance)
     local ONE_OF_TAGS = nil
 
     local ents = GLOBAL.TheSim:FindEntities(x, y, z, distance, TAGS, EXCLUDE_TAGS, ONE_OF_TAGS)
-    local parsed_ents = {}
+    return ents
+end
 
+function GetParsedEntities(distance)
+    local player = GLOBAL.GetPlayer()
+    local entities = GetNearbyEntities(distance)
+    local parsed_ents = {}
     for k, v in pairs(entities) do
         if player.GUID ~= v.GUID then
             local entity = Entity(player, v)
@@ -289,9 +294,7 @@ function GetNearbyEntities(distance)
         end
     end
     return parsed_ents
-    return ents
 end
-
 
 function PickEntity(entity_name)
     local entity = GetEntity(entity_name)
@@ -626,7 +629,7 @@ function PreparePlayerCharacter(player)
             season = "",
             timeOfDay = GetTimeOfDay(),
             -- availableRecipes = BuildableItems(),
-            entitiesOnScreen = GetNearbyEntities(DISTANCE),
+            entitiesOnScreen = GetParsedEntities(DISTANCE),
         }
 
         local str = json.encode(tbl, {
