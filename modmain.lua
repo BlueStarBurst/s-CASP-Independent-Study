@@ -240,10 +240,10 @@ local function Entity(inst, v)
     d.Stewer = v.components.stewer and true
 
     d.Workable = v.components.workable and v.components.workable:CanBeWorked() and true
-    d.Choppable = v:HasTag("CHOP_workable") and true
-    d.Diggable = v:HasTag("DIG_workable") and true
-    d.Hammerable = v:HasTag("HAMMER_workable") and true
-    d.Mineable = v:HasTag("MINE_workable") and true
+    d.Choppable = d.Workable and v.components.workable.action == GLOBAL.ACTIONS.CHOP and true
+    d.Diggable = d.Workable and v.components.workable.action == GLOBAL.ACTIONS.DIG and true
+    d.Hammerable = d.Workable and v.components.workable.action == GLOBAL.ACTIONS.HAMMER and true
+    d.Mineable = d.Workable and v.components.workable.action == GLOBAL.ACTIONS.MINE and true
     
     -- remove all keyx with false values
     for k, v in pairs(d) do
