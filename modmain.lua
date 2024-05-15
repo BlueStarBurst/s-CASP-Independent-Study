@@ -490,13 +490,13 @@ end
 function IsPlayerInLight()
     local player = GLOBAL.GetPlayer()
     local x, y, z = player.Transform:GetWorldPosition()
-    local ents = GetNearbyEntities(5)
+    local ents = GetNearbyEntities(10)
 
     for k, v in pairs(ents) do
-        if v:HasTag("lightsource") then
+        if v.components.burnable and v.components.burnable:GetLargestLightRadius() then
             local ex, ey, ez = v.Transform:GetWorldPosition()
             local d = math.sqrt((x - ex) ^ 2 + (y - ey) ^ 2 + (z - ez) ^ 2)
-            if d < 5 then
+            if d < v.components.burnable:GetLargestLightRadius() then
                 return true
             end
         end
@@ -625,6 +625,56 @@ function RunAway(monster_name)
     end
 end
 
+function EatFood(item_name)
+    local player = GLOBAL.GetPlayer()
+    local inventory = player.components.inventory
+    local slot = -1
+    for k, v in pairs(inventory.itemslots) do
+        if v.prefab == item_name then
+            slot = k
+            break
+        end
+    end
+
+    if slot == -1 then
+        return false
+    end
+
+    player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, nil, GLOBAL.ACTIONS.EAT, inventory.itemslots[slot],
+        nil, nil, 0, nil, 2), true)
+    return true
+end
+
+function AddFuel(item_name)
+    local player = GLOBAL.GetPlayer()
+    local inventory = player.components.inventory
+    local slot = -1
+    for k, v in pairs(inventory.itemslots) do
+        if v.prefab == item_name then
+            slot = k
+            break
+        end
+    end
+
+    if slot == -1 then
+        return false
+    end
+
+    local ents = GetNearbyEntities(DISTANCE)
+    local entity = nil
+    for k, v in pairs(ents) do
+        if v.components.fueled then
+            entity = v
+            break
+        end
+    end
+
+    if entity and entity.components.fueled then
+        player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, entity, GLOBAL.ACTIONS.ADDFUEL,
+            inventory.itemslots[slot], nil, nil, 0, nil, 2), true)
+    end
+end
+
 -- END ACTIONS --
 
 -- PLAYER --
@@ -653,6 +703,10 @@ function PreparePlayerCharacter(player)
     local isBusy = false
 
     player:DoPeriodicTask(1, function()
+
+        if isBusy then
+            return
+        end
 
         -- if locomotor is currently performing an action, don't read from the server
 
@@ -700,6 +754,11 @@ function PreparePlayerCharacter(player)
         -- print(str)
 
         SendData(str)
+        isBusy = true
+
+    end)
+
+    player:DoPeriodicTask(1, function()
 
         local data = ReceiveData()
 
@@ -713,26 +772,66 @@ function PreparePlayerCharacter(player)
             if tbl then
                 for k, v in pairs(tbl) do
                     if k == "action" then
-                        if v == "walk" then
+
+                        -- action(equip_torch_night_hostile, 1) :- time(night), -equipment(torch), item(torch, X).
+                        -- action(run_away_from_enemy, 2) :- hostile(X).
+                        -- action(eat_maybe_food, 3) :- hunger(low), item(X, N), not good_food(X).
+                        -- action(eat_edible_food, 4) :- hunger(low), edible(X), item(X, N).
+                        -- action(pick_flower, 5) :- -time(night), sanity(low), on_screen(flower, X).
+                        -- action(wander_flower, 6) :- -time(night), sanity(low).
+                        -- action(run_to_campfire, 7) :- time(night), on_screen(X, N), fueled(X), X=campfire, X=firepit.
+                        -- action(fuel_campfire, 8) :- time(night), on_screen(X, N), fueled(X), X=campfire, X=firepit, fuel(Y), item(Y, N), fuel(Y).
+                        -- action(build_campfire, 9) :- time(night_soon), campfire_ingredients(X), -on_screen(campfire, X).
+                        -- action(equip_torch_night, 10) :- time(night), item(torch, X), -equipment(torch).
+                        -- action(build_torch_night, 11) :- time(night), torch_ingredients(X), -on_screen(campfire, X).
+                        -- action(cook_food, 12) :- cookable(X), item(X, N), time(night).
+                        -- action(pick_anything, 13) :- on_screen(X, N), good_pick(X).
+                        -- action(build_axe, 14) :- axe_ingredients(X), -equipment(axe), -item(axe, N).
+                        -- action(build_torch, 15) :- torch_ingredients(X), -equipment(torch), -item(torch, N).
+                        -- action(equip_axe, 16) :- -equipment(axe), item(axe, N).
+                        -- action(chop_tree, 17) :- on_screen(X, N), choppable(X).
+
+                        if v == "equip_torch_night_hostile" then
+                            Equip("torch")
+                        elseif v == "run_away_from_enemy" then
+                            RunAway("spider")
+                        elseif v == "eat_maybe_food" then
+                            EatFood("carrot")
+                        elseif v == "eat_edible_food" then
+                            EatFood("carrot")
+                        elseif v == "pick_flower" then
+                            PickEntity("flower")
+                        elseif v == "wander_flower" then
                             Wander()
-                        elseif v == "pick" then
-                            PickEntity("rabbit")
-                        elseif v == "drop" then
-                            DropItem("cutgrass")
-                        elseif v == "craft" then
-                            Build("axe")
-                        elseif v == "cook" then
+                        elseif v == "run_to_campfire" then
+                            WalkToEntity("campfire")
+                        elseif v == "fuel_campfire" then
+                            AddFuel("log")
+                        elseif v == "build_campfire" then
+                            Build("campfire")
+                        elseif v == "equip_torch_night" then
+                            Equip("torch")
+                        elseif v == "build_torch_night" then
+                            Build("torch")
+                        elseif v == "cook_food" then
                             Cook("meat")
-                        elseif v == "sleep" then
-                            PlayerSleep()
-                        elseif v == "chop" then
+                        elseif v == "pick_anything" then
+                            PickEntity("flower")
+                        elseif v == "build_axe" then
+                            Build("axe")
+                        elseif v == "build_torch" then
+                            Build("torch")
+                        elseif v == "equip_axe" then
+                            Equip("axe")
+                        elseif v == "chop_tree" then
                             CutDownTree()
-                            -- Build("campfire")
                         end
                     end
                 end
             end
         end
+
+        isBusy = false
 
     end)
 

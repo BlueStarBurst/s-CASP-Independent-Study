@@ -44,7 +44,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 
                 
                 # send json data of action: "chop" to the client
-                data = json.dumps({"action": "chop"})
+                data = json.dumps({"action": "chop_tree"})
                 # encode to bytes
                 data = data.encode("utf-8")
                 
