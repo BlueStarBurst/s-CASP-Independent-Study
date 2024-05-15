@@ -1,6 +1,5 @@
 local DISTANCE = 20
 
-
 -- A Don't Starve mod that reads the current state of the game and outputs it to a file. This is a mod for the sCASP project.
 local require = GLOBAL.require
 
@@ -74,8 +73,6 @@ function GetTimeOfDay()
     }
 end
 
-
-
 function CanBuild(item)
     local player = GLOBAL.GetPlayer()
     local inventory = player.components.inventory
@@ -123,8 +120,7 @@ function Build(item)
                 if count < amount then
                     print("Missing ingredient: ", ingredient, " amount: ", amount - count)
                     -- find entity with the ingredient
-                    
-                    
+
                     if ingredient == "twigs" then
                         if PickEntity("sapling") then
                             return true
@@ -167,13 +163,13 @@ function Build(item)
     return true
 end
 
-
 local prev_angle = 0
 
 function WalkToXYZ(x, y, z)
     local player = GLOBAL.GetPlayer()
 
-    local buffered = GLOBAL.BufferedAction(player, nil, GLOBAL.ACTIONS.WALKTO, nil, GLOBAL.Vector3(x, y, z), nil, 0, true)
+    local buffered = GLOBAL.BufferedAction(player, nil, GLOBAL.ACTIONS.WALKTO, nil, GLOBAL.Vector3(x, y, z), nil, 0,
+        true)
 
     player.components.locomotor:PushAction(buffered, true)
 
@@ -189,10 +185,7 @@ function WalkToXYZ(x, y, z)
         end
     end)
 
-    
-
 end
-
 
 function WalkInAngle(angle, distance)
     local player = GLOBAL.GetPlayer()
@@ -218,7 +211,7 @@ function Wander()
         print("Player is busy")
         return
     end
-    
+
     local angle = prev_angle + math.random(-1, 1) * math.pi / 3
     prev_angle = angle
 
@@ -227,36 +220,33 @@ function Wander()
     print("WANDERING")
 end
 
-
-
 local function Entity(inst, v)
-	local d = {}
+    local d = {}
 
-	d.GUID = v.GUID
-	d.Prefab = v.prefab
-	d.Quantity = v.components.stackable ~= nil and v.components.stackable:StackSize() or 1
+    d.GUID = v.GUID
+    d.Prefab = v.prefab
+    d.Quantity = v.components.stackable ~= nil and v.components.stackable:StackSize() or 1
 
-	d.Collectable = v:HasTag("pickable") 
-	d.Cooker = v:HasTag("cooker")
-	d.Cookable = v:HasTag("cookable")
-	d.Edible = inst.components.eater:CanEat(v)
-	d.Equippable = v:HasTag("_equippable")
-	d.Fuel = v:HasTag("BURNABLE_fuel")
-	d.Fueled = v:HasTag("BURNABLE_fueled")
-	d.Grower = v:HasTag("grower")
-	d.Harvestable = v:HasTag("readyforharvest") or (v.components.stewer and v.components.stewer:IsDone())
-	d.Pickable = v.components.inventoryitem and v.components.inventoryitem.canbepickedup and not v:HasTag("heavy") -- PICKUP
-	d.Stewer= v:HasTag("stewer")
+    d.Collectable = v.components.pickable and v.components.pickable:CanBePicked()
+    -- d.Cooker = v:HasTag("cooker")
+    d.Cookable = v.components.cookable and true
+    d.Edible = inst.components.eater:CanEat(v)
+    d.Equippable = v.components.equippable and true
+    d.Fuel = v.components.fuel and true
+    d.Fueled = v.components.fueled and not v.components.fueled:IsEmpty()
+    -- d.Grower = v:HasTag("grower")
+    d.Harvestable = v:HasTag("readyforharvest") or (v.components.stewer and v.components.stewer:IsDone())
+    d.Pickable = v.components.inventoryitem and v.components.inventoryitem.canbepickedup and not v:HasTag("heavy") -- PICKUP
+    -- d.Stewer = v:HasTag("stewer")
 
-	d.Choppable = v:HasTag("CHOP_workable")
-	d.Diggable = v:HasTag("DIG_workable")
-	d.Hammerable = v:HasTag("HAMMER_workable")
-	d.Mineable = v:HasTag("MINE_workable")
+    d.Workable = v.components.workable and v.components.workable:CanBeWorked()
+    -- d.Diggable = v:HasTag("DIG_workable")
+    -- d.Hammerable = v:HasTag("HAMMER_workable")
+    -- d.Mineable = v:HasTag("MINE_workable")
 
-	--d.X, d.Y, d.Z = v.Transform:GetWorldPosition() --Useless for now?
-	return d
+    -- d.X, d.Y, d.Z = v.Transform:GetWorldPosition() --Useless for now?
+    return d
 end
-
 
 function GetInventoryItems()
 
@@ -274,7 +264,7 @@ end
 function GetNearbyEntities(distance)
     local player = GLOBAL.GetPlayer()
     local x, y, z = player.Transform:GetWorldPosition()
-    
+
     local TAGS = nil
     local EXCLUDE_TAGS = {"INLIMBO", "NOCLICK", "CLASSIFIED", "FX"}
     local ONE_OF_TAGS = nil
@@ -309,10 +299,9 @@ function PickEntity(entity_name)
             components_string = components_string .. k .. " "
         end
 
-        print("Picking entity: ", entity_name, " can be picked: ", entity.components.pickable:CanBePicked(),
-            " components: ", components_string)
-
         if entity.components.pickable and entity.components.pickable:CanBePicked() then
+            print("Picking entity: ", entity_name, " can be picked: ", entity.components.pickable:CanBePicked(),
+                " components: ", components_string)
             player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, entity, GLOBAL.ACTIONS.PICK, nil, nil,
                 nil, 0, nil, 2), true)
             return true
@@ -342,7 +331,6 @@ function PickUpEntity(entity_name) -- pick up entity from the ground
         -- player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, nil, GLOBAL.ACTIONS.WALKTO, nil,
         -- GLOBAL.Vector3(x, y, z), nil, 0, true), true)
 
-
         player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, entity, GLOBAL.ACTIONS.PICKUP, nil, nil,
             nil, 0, nil, 2), true)
 
@@ -350,9 +338,6 @@ function PickUpEntity(entity_name) -- pick up entity from the ground
 
         -- sleep for 2 seconds
         -- GLOBAL.Sleep(2)
-
-
-
 
     end
     return false
@@ -426,7 +411,7 @@ function GetEntity(name)
 
             -- not in limbo
             if not v:IsInLimbo() then
-                
+
                 local ex, ey, ez = v.Transform:GetWorldPosition()
                 local d = math.sqrt((x - ex) ^ 2 + (y - ey) ^ 2 + (z - ez) ^ 2)
                 if d < dist then
@@ -498,6 +483,30 @@ function MakeAxe()
     return Build("axe")
 end
 
+function Equip(item_name)
+    local player = GLOBAL.GetPlayer()
+    local inventory = player.components.inventory
+    local slot = -1
+    for k, v in pairs(inventory.itemslots) do
+        if v and v.prefab == item_name then
+            slot = k
+            break
+        end
+    end
+
+    if slot == -1 then
+        Build(item_name)
+        return false
+    end
+
+    if not inventory.equipslots[slot] then
+        player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, nil, GLOBAL.ACTIONS.EQUIP,
+            inventory.itemslots[slot], nil, nil, 0, nil, 2), true)
+    end
+
+    return true
+end
+
 function CutDownTree()
     local player = GLOBAL.GetPlayer()
     local x, y, z = player.Transform:GetWorldPosition()
@@ -512,29 +521,31 @@ function CutDownTree()
         end
     end
 
-
-    -- if player has axe equipped, chop down tree
-    local inventory = player.components.inventory
-    local slot = -1
-    for k, v in pairs(inventory.equipslots) do
-        if v and v.prefab == "axe" then
-            slot = k
-            break
-        end
-    end
-
-    if slot == -1 then
-        -- if no axe, craft one
-        MakeAxe()
+    if not Equip("axe") then
         return
-
     end
 
-    -- if axe is not equipped, equip it
-    if not inventory.equipslots[slot] then
-        player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, nil, GLOBAL.ACTIONS.EQUIP, inventory.itemslots[slot], nil, nil, 0, nil, 2), true)
-    end
+    -- -- if player has axe equipped, chop down tree
+    -- local inventory = player.components.inventory
+    -- local slot = -1
+    -- for k, v in pairs(inventory.equipslots) do
+    --     if v and v.prefab == "axe" then
+    --         slot = k
+    --         break
+    --     end
+    -- end
 
+    -- if slot == -1 then
+    --     -- if no axe, craft one
+    --     MakeAxe()
+    --     return
+
+    -- end
+
+    -- -- if axe is not equipped, equip it
+    -- if not inventory.equipslots[slot] then
+    --     player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, nil, GLOBAL.ACTIONS.EQUIP, inventory.itemslots[slot], nil, nil, 0, nil, 2), true)
+    -- end
 
     local ents = GLOBAL.TheSim:FindEntities(x, y, z, 10)
     local closest = nil
@@ -553,12 +564,40 @@ function CutDownTree()
     end
 
     if closest then
-        player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, closest, GLOBAL.ACTIONS.CHOP, nil, nil, nil,
-            0, nil, 2), true)
+        player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, closest, GLOBAL.ACTIONS.CHOP, nil, nil,
+            nil, 0, nil, 2), true)
     else
         Wander()
     end
 end
+
+
+function RunAway(monster_name)
+    local player = GLOBAL.GetPlayer()
+    local x, y, z = player.Transform:GetWorldPosition()
+
+    local ents = GLOBAL.TheSim:FindEntities(x, y, z, 10)
+    local closest = nil
+    local dist = 1000
+    for k, v in pairs(ents) do
+        if v.prefab == monster_name then
+            local ex, ey, ez = v.Transform:GetWorldPosition()
+            local d = math.sqrt((x - ex) ^ 2 + (y - ey) ^ 2 + (z - ez) ^ 2)
+            if d < dist then
+                dist = d
+                closest = v
+            end
+        end
+    end
+
+    if closest then
+        player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, closest, GLOBAL.ACTIONS.RUNAWAY, nil, nil,
+            nil, 0, nil, 2), true)
+    else
+        Wander()
+    end
+end
+
 
 -- END ACTIONS --
 
@@ -587,18 +626,14 @@ function PreparePlayerCharacter(player)
 
     local isBusy = false
 
-    
-
     player:DoPeriodicTask(1, function()
 
         -- if locomotor is currently performing an action, don't read from the server
-        
+
         local playerfacing = player.Transform:GetRotation()
         local x, y, z = player.Transform:GetWorldPosition()
 
         -- print("Health: ", player.components.health:GetDebugString())
-
-        
 
         -- GetDistanceFrom("researchlab") -- You need to be closer than 4 units to use it
         -- PlayerSleep()
@@ -610,26 +645,25 @@ function PreparePlayerCharacter(player)
         -- print(player.components.health:GetDebugString())
         -- print(player.components.hunger:GetDebugString())
         -- print(player.components.sanity:GetDebugString())
-        
 
         local tbl = {
             health = player.components.health:GetDebugString(),
             hunger = player.components.hunger:GetDebugString(),
             sanity = player.components.sanity:GetDebugString(),
-        
+
             position = {
                 x = x,
                 y = y,
                 z = z
             },
-        
+
             inventory = GetInventoryItems(),
             equipped = {},
             biome = "",
             season = "",
             timeOfDay = GetTimeOfDay(),
             -- availableRecipes = BuildableItems(),
-            entitiesOnScreen = GetParsedEntities(DISTANCE),
+            entitiesOnScreen = GetParsedEntities(DISTANCE)
         }
 
         local str = json.encode(tbl, {
@@ -639,8 +673,6 @@ function PreparePlayerCharacter(player)
         -- print(str)
 
         SendData(str)
-
-        
 
         local data = ReceiveData()
 
@@ -667,14 +699,14 @@ function PreparePlayerCharacter(player)
                         elseif v == "sleep" then
                             PlayerSleep()
                         elseif v == "chop" then
-                            -- CutDownTree()
-                            Build("campfire")
+                            CutDownTree()
+                            -- Build("campfire")
                         end
                     end
                 end
             end
         end
-        
+
     end)
 
     -- debugging help
