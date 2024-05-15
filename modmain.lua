@@ -228,21 +228,22 @@ local function Entity(inst, v)
     d.Quantity = v.components.stackable ~= nil and v.components.stackable:StackSize() or 1
 
     d.Collectable = v.components.pickable and v.components.pickable:CanBePicked()
-    -- d.Cooker = v:HasTag("cooker")
-    d.Cookable = v.components.cookable and true
+    d.Cooker = v.components.cooker and true
+    d.Cookable = v.components.cookable and true 
     d.Edible = inst.components.eater:CanEat(v)
     d.Equippable = v.components.equippable and true
     d.Fuel = v.components.fuel and true
     d.Fueled = v.components.fueled and not v.components.fueled:IsEmpty()
-    -- d.Grower = v:HasTag("grower")
+    d.Grower = v.components.grower and true
     d.Harvestable = v:HasTag("readyforharvest") or (v.components.stewer and v.components.stewer:IsDone())
     d.Pickable = v.components.inventoryitem and v.components.inventoryitem.canbepickedup and not v:HasTag("heavy") -- PICKUP
-    -- d.Stewer = v:HasTag("stewer")
+    d.Stewer = v.components.stewer and true
 
     d.Workable = v.components.workable and v.components.workable:CanBeWorked()
-    -- d.Diggable = v:HasTag("DIG_workable")
-    -- d.Hammerable = v:HasTag("HAMMER_workable")
-    -- d.Mineable = v:HasTag("MINE_workable")
+    d.Choppable = v:HasTag("CHOP_workable")
+    d.Diggable = v:HasTag("DIG_workable")
+    d.Hammerable = v:HasTag("HAMMER_workable")
+    d.Mineable = v:HasTag("MINE_workable")
 
     -- d.X, d.Y, d.Z = v.Transform:GetWorldPosition() --Useless for now?
     return d
