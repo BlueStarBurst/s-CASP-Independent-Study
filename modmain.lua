@@ -227,23 +227,30 @@ local function Entity(inst, v)
     d.Prefab = v.prefab
     d.Quantity = v.components.stackable ~= nil and v.components.stackable:StackSize() or 1
 
-    d.Collectable = v.components.pickable and v.components.pickable:CanBePicked()
+    d.Collectable = v.components.pickable and v.components.pickable:CanBePicked() and true
     d.Cooker = v.components.cooker and true
     d.Cookable = v.components.cookable and true 
-    d.Edible = inst.components.eater:CanEat(v)
+    d.Edible = inst.components.eater:CanEat(v) and true
     d.Equippable = v.components.equippable and true
     d.Fuel = v.components.fuel and true
-    d.Fueled = v.components.fueled and not v.components.fueled:IsEmpty()
+    d.Fueled = v.components.fueled and not v.components.fueled:IsEmpty() and true
     d.Grower = v.components.grower and true
-    d.Harvestable = v:HasTag("readyforharvest") or (v.components.stewer and v.components.stewer:IsDone())
-    d.Pickable = v.components.inventoryitem and v.components.inventoryitem.canbepickedup and not v:HasTag("heavy") -- PICKUP
+    d.Harvestable = v:HasTag("readyforharvest") or (v.components.stewer and v.components.stewer:IsDone()) and true
+    d.Pickable = v.components.inventoryitem and v.components.inventoryitem.canbepickedup and not v:HasTag("heavy") and true -- PICKUP
     d.Stewer = v.components.stewer and true
 
-    d.Workable = v.components.workable and v.components.workable:CanBeWorked()
-    d.Choppable = v:HasTag("CHOP_workable")
-    d.Diggable = v:HasTag("DIG_workable")
-    d.Hammerable = v:HasTag("HAMMER_workable")
-    d.Mineable = v:HasTag("MINE_workable")
+    d.Workable = v.components.workable and v.components.workable:CanBeWorked() and true
+    d.Choppable = v:HasTag("CHOP_workable") and true
+    d.Diggable = v:HasTag("DIG_workable") and true
+    d.Hammerable = v:HasTag("HAMMER_workable") and true
+    d.Mineable = v:HasTag("MINE_workable") and true
+    
+    -- remove all keyx with false values
+    for k, v in pairs(d) do
+        if not v then
+            d[k] = nil
+        end
+    end
 
     -- d.X, d.Y, d.Z = v.Transform:GetWorldPosition() --Useless for now?
     return d
