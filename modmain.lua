@@ -708,7 +708,7 @@ function CutDownTree()
     local ents = GLOBAL.TheSim:FindEntities(x, y, z, 10)
     for k, v in pairs(ents) do
         if v.prefab == "log" or v.prefab == "pinecone" then
-            if PickUpEntity(v.guid) == true then
+            if PickUpEntityByName(v.prefab) == true then
                 return
             end
         end
