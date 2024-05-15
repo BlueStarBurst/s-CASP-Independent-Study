@@ -763,15 +763,15 @@ function CutDownTree()
     end
 end
 
-function RunAway(monster_name)
+function RunAway() -- run away from nearest entity with hostile tag
     local player = GLOBAL.GetPlayer()
     local x, y, z = player.Transform:GetWorldPosition()
 
-    local ents = GLOBAL.TheSim:FindEntities(x, y, z, 10)
+    local ents = GetNearbyEntities(DISTANCE)
     local closest = nil
     local dist = 1000
     for k, v in pairs(ents) do
-        if v.prefab == monster_name then
+        if v:HasTag("hostile") then
             local ex, ey, ez = v.Transform:GetWorldPosition()
             local d = math.sqrt((x - ex) ^ 2 + (y - ey) ^ 2 + (z - ez) ^ 2)
             if d < dist then
@@ -782,10 +782,11 @@ function RunAway(monster_name)
     end
 
     if closest then
-        player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, closest, GLOBAL.ACTIONS.RUNAWAY, nil, nil,
-            nil, 0, nil, 2), true)
-    else
-        Wander()
+        local ex, ey, ez = closest.Transform:GetWorldPosition()
+        local dx = x - ex
+        local dz = z - ez
+        local angle = math.atan2(dz, dx)
+        WalkInAngle(angle + math.pi, 10)
     end
 end
 
