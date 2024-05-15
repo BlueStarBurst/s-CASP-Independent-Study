@@ -479,14 +479,36 @@ function DropStack(item_name, amount)
     player.components.locomotor:PushAction(action, true)
 end
 
-function MakeAxe()
-    return Build("axe")
+function IsPlayerInLight()
+    local player = GLOBAL.GetPlayer()
+    local x, y, z = player.Transform:GetWorldPosition()
+    local ents = GetNearbyEntities(5)
+
+    for k, v in pairs(ents) do
+        if v:HasTag("lightsource") then
+            local ex, ey, ez = v.Transform:GetWorldPosition()
+            local d = math.sqrt((x - ex) ^ 2 + (y - ey) ^ 2 + (z - ez) ^ 2)
+            if d < 5 then
+                return true
+            end
+        end
+    end
+    return false
+
 end
 
 function Equip(item_name)
     local player = GLOBAL.GetPlayer()
     local inventory = player.components.inventory
     local slot = -1
+
+    -- if item is in equipslots, return
+    for k, v in pairs(inventory.equipslots) do
+        if v and v.prefab == item_name then
+            return true
+        end
+    end
+
     for k, v in pairs(inventory.itemslots) do
         if v and v.prefab == item_name then
             slot = k
@@ -499,10 +521,8 @@ function Equip(item_name)
         return false
     end
 
-    if not inventory.equipslots[slot] then
-        player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, nil, GLOBAL.ACTIONS.EQUIP,
-            inventory.itemslots[slot], nil, nil, 0, nil, 2), true)
-    end
+    player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, nil, GLOBAL.ACTIONS.EQUIP,
+        inventory.itemslots[slot], nil, nil, 0, nil, 2), true)
 
     return true
 end
@@ -571,7 +591,6 @@ function CutDownTree()
     end
 end
 
-
 function RunAway(monster_name)
     local player = GLOBAL.GetPlayer()
     local x, y, z = player.Transform:GetWorldPosition()
@@ -597,7 +616,6 @@ function RunAway(monster_name)
         Wander()
     end
 end
-
 
 -- END ACTIONS --
 
@@ -660,6 +678,7 @@ function PreparePlayerCharacter(player)
             inventory = GetInventoryItems(),
             equipped = {},
             biome = "",
+            isInLight = IsPlayerInLight(),
             season = "",
             timeOfDay = GetTimeOfDay(),
             -- availableRecipes = BuildableItems(),
