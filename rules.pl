@@ -1,19 +1,30 @@
-eat_good_food(A):- hunger(low), good_food(X), item(X, Y), Y.>=.1.
+eat_good_food(A):- hunger(low), good_food(X), item(X, Y).
 
-equip_torch(A):- item(torch, X).
-build_torch(A):- item(cutgrass, X), item(twig, X), X.>=.2.
+torch_ingredients(A):- item(cutgrass, X), item(twig, X), X.>=.2.
 
-equip_axe(A):- item(axe, X).
-build_axe(A):- item(flint, X), item(twig, X), X.>=.1.
+axe_ingredients(A):- item(flint, X), item(twig, X), X.>=.1.
 
-build_campfire(A):- item(log, X), X.>=.2, item(cutgrass, Y), Y.>=.3.
+campfire_ingredients(A):- item(log, X), X.>=.2, item(cutgrass, Y), Y.>=.3.
 
-build_garland(A):- item(petals, X), X.>=.12.
-equip_garland(A):- item(garland, X).
+garland_ingredients(A):- item(petals, X), X.>=.12.
 
 %action(Action Name, Priority)
-action(run_away, 1) :- hostile(X).
-action(wander_flower, 2) :- -time(night), sanity(half).
-action(eat_flower, 3) :- sanity(low).
+action(equip_torch_night_hostile, 1) :- time(night), -equipment(torch), item(torch, X).
+action(run_away_from_enemy, 2) :- hostile(X).
+action(eat_maybe_food, 3) :- hunger(low), item(X, N), not good_food(X).
+action(eat_edible_food, 4) :- hunger(low), edible(X), item(X, N).
+action(pick_flower, 5) :- -time(night), sanity(low), on_screen(flower, X).
+action(wander_flower, 6) :- -time(night), sanity(low).
+action(run_to_campfire, 7) :- time(night), on_screen(X, N), fueled(X), X=campfire, X=firepit.
+action(fuel_campfire, 8) :- time(night), on_screen(X, N), fueled(X), X=campfire, X=firepit, fuel(Y), item(Y, N), fuel(Y).
+action(build_campfire, 9) :- time(night_soon), campfire_ingredients(X), -on_screen(campfire, X).
+action(equip_torch_night, 10) :- time(night), item(torch, X), -equipment(torch).
+action(build_torch_night, 11) :- time(night), torch_ingredients(X), -on_screen(campfire, X).
+action(cook_food, 12) :- cookable(X), item(X, N), time(night).
+action(pick_anything, 13) :- on_screen(X, N), good_pick(X).
+action(build_axe, 14) :- axe_ingredients(X), -equipment(axe), -item(axe, N).
+action(build_torch, 15) :- torch_ingredients(X), -equipment(torch), -item(torch, N).
+action(equip_axe, 16) :- -equipment(axe), item(axe, N).
+action(chop_tree, 17) :- on_screen(X, N), choppable(X).
 
-?- action(A, N).
+?- action(A, P).
