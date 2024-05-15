@@ -227,23 +227,23 @@ local function Entity(inst, v)
     d.Prefab = v.prefab
     d.Quantity = v.components.stackable ~= nil and v.components.stackable:StackSize() or 1
 
-    d.Collectable = v.components.pickable and v.components.pickable:CanBePicked() and true
-    d.Cooker = v.components.cooker and true
-    d.Cookable = v.components.cookable and true 
-    d.Edible = inst.components.eater:CanEat(v) and true
-    d.Equippable = v.components.equippable and true
-    d.Fuel = v.components.fuel and true
-    d.Fueled = v.components.fueled and not v.components.fueled:IsEmpty() and true
-    d.Grower = v.components.grower and true
-    d.Harvestable = v:HasTag("readyforharvest") or (v.components.stewer and v.components.stewer:IsDone()) and true
-    d.Pickable = v.components.inventoryitem and v.components.inventoryitem.canbepickedup and not v:HasTag("heavy") and true -- PICKUP
-    d.Stewer = v.components.stewer and true
+    d.Pickable = v.components.pickable and v.components.pickable:CanBePicked()
+    d.Cooker = v.components.cooker
+    d.Cookable = v.components.cookable
+    d.Edible = inst.components.eater:CanEat(v)
+    d.Equippable = v.components.equippable
+    d.Fuel = v.components.fuel
+    d.Fueled = v.components.fueled and not v.components.fueled:IsEmpty()
+    d.Grower = v.components.grower
+    d.Harvestable = v:HasTag("readyforharvest") or (v.components.stewer and v.components.stewer:IsDone())
+    d.Collectable = v.components.inventoryitem and v.components.inventoryitem.canbepickedup and not v:HasTag("heavy") -- PICKUP
+    d.Stewer = v.components.stewer
 
-    d.Workable = v.components.workable and v.components.workable:CanBeWorked() and true
-    d.Choppable = d.Workable and v.components.workable.action == GLOBAL.ACTIONS.CHOP and true
-    d.Diggable = d.Workable and v.components.workable.action == GLOBAL.ACTIONS.DIG and true
-    d.Hammerable = d.Workable and v.components.workable.action == GLOBAL.ACTIONS.HAMMER and true
-    d.Mineable = d.Workable and v.components.workable.action == GLOBAL.ACTIONS.MINE and true
+    d.Workable = v.components.workable and v.components.workable:CanBeWorked()
+    d.Choppable = d.Workable and v.components.workable.action == GLOBAL.ACTIONS.CHOP
+    d.Diggable = d.Workable and v.components.workable.action == GLOBAL.ACTIONS.DIG
+    d.Hammerable = d.Workable and v.components.workable.action == GLOBAL.ACTIONS.HAMMER
+    d.Mineable = d.Workable and v.components.workable.action == GLOBAL.ACTIONS.MINE
     
     -- remove all keyx with false values
     for k, v in pairs(d) do
@@ -731,11 +731,11 @@ function PreparePlayerCharacter(player)
             hunger = player.components.hunger:GetDebugString(),
             sanity = player.components.sanity:GetDebugString(),
 
-            position = {
-                x = x,
-                y = y,
-                z = z
-            },
+            -- position = {
+            --     x = x,
+            --     y = y,
+            --     z = z
+            -- },
 
             inventory = GetInventoryItems(),
             equipped = {},
