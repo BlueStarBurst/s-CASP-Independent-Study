@@ -21,10 +21,10 @@ action(build_campfire, 9) :- time(night_soon), campfire_ingredients(X), -on_scre
 action(equip_torch_night, 10) :- time(night), item(torch, X), -equipment(torch).
 action(build_torch_night, 11) :- time(night), torch_ingredients(X), -on_screen(campfire, X).
 action(cook_food, 12) :- cookable(X), item(X, N), time(night).
-action(pick_anything, 13) :- on_screen(X, N), good_pick(X).
-action(build_axe, 14) :- axe_ingredients(X), -equipment(axe), -item(axe, N).
-action(build_torch, 15) :- torch_ingredients(X), -equipment(torch), -item(torch, N).
-action(equip_axe, 16) :- -equipment(axe), item(axe, N).
-action(chop_tree, 17) :- on_screen(X, N), choppable(X).
+action(build_axe, 13) :- axe_ingredients(X), -equipment(axe), -item(axe, N).
+action(build_torch, 14) :- torch_ingredients(X), -equipment(torch), -item(torch, N).
+action(equip_axe, 15) :- -equipment(axe), item(axe, N).
+action(chop_tree, 16) :- on_screen(X, N), choppable(X).
+action(pick_anything, 17) :- on_screen(X, N), good_pick(X).
 
 ?- action(A, P).
