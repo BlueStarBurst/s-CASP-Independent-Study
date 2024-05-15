@@ -1014,41 +1014,41 @@ function PreparePlayerCharacter(player)
                         print("Action: ", v)
                         -- loadstring("return " .. v)()
 
-                        if v == "equip_torch_night_hostile" then
-                            Equip("torch")
-                        elseif v == "run_away_from_enemy" then
-                            RunAway("spider") -- no params
-                        elseif v == "eat_maybe_food" then
-                            EatFood("carrot") -- no params
-                        elseif v == "eat_edible_food" then
-                            EatFood("carrot") -- no params
-                        elseif v == "pick_flower" then
-                            PickEntity("flower")
-                        elseif v == "wander_flower" then
-                            Wander()
-                        elseif v == "run_to_campfire" then
-                            WalkToEntity("campfire")
-                        elseif v == "fuel_campfire" then
-                            AddFuel("log") -- no params
-                        elseif v == "build_campfire" then
-                            Build("campfire")
-                        elseif v == "equip_torch_night" then
-                            Equip("torch")
-                        elseif v == "build_torch_night" then
-                            Build("torch")
-                        elseif v == "cook_food" then
-                            Cook("meat") -- no params
-                        elseif v == "pick_anything" then
-                            PickEntity("flower") -- no params
-                        elseif v == "build_axe" then
-                            Build("axe")
-                        elseif v == "build_torch" then
-                            Build("torch")
-                        elseif v == "equip_axe" then
-                            Equip("axe")
-                        elseif v == "chop_tree" then
-                            CutDownTree()
-                        end
+                        -- if v == "equip_torch_night_hostile" then
+                        --     Equip("torch")
+                        -- elseif v == "run_away_from_enemy" then
+                        --     RunAway("spider") -- no params
+                        -- elseif v == "eat_maybe_food" then
+                        --     EatFood("carrot") -- no params
+                        -- elseif v == "eat_edible_food" then
+                        --     EatFood("carrot") -- no params
+                        -- elseif v == "pick_flower" then
+                        --     PickEntity("flower")
+                        -- elseif v == "wander_flower" then
+                        --     Wander()
+                        -- elseif v == "run_to_campfire" then
+                        --     WalkToEntity("campfire")
+                        -- elseif v == "fuel_campfire" then
+                        --     AddFuel("log") -- no params
+                        -- elseif v == "build_campfire" then
+                        --     Build("campfire")
+                        -- elseif v == "equip_torch_night" then
+                        --     Equip("torch")
+                        -- elseif v == "build_torch_night" then
+                        --     Build("torch")
+                        -- elseif v == "cook_food" then
+                        --     Cook("meat") -- no params
+                        -- elseif v == "pick_anything" then
+                        --     PickEntity("flower") -- no params
+                        -- elseif v == "build_axe" then
+                        --     Build("axe")
+                        -- elseif v == "build_torch" then
+                        --     Build("torch")
+                        -- elseif v == "equip_axe" then
+                        --     Equip("axe")
+                        -- elseif v == "chop_tree" then
+                        --     CutDownTree()
+                        -- end
                     end
                 end
             end
