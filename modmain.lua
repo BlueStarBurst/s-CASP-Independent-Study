@@ -250,6 +250,7 @@ local function Entity(inst, v)
     d.Harvestable = v:HasTag("readyforharvest") or (v.components.stewer and v.components.stewer:IsDone())
     d.Collectable = v.components.inventoryitem and v.components.inventoryitem.canbepickedup and not v:HasTag("heavy") -- PICKUP
     d.Stewer = v.components.stewer and true
+    d.Hostile = v:HasTag("hostile") and true
 
     d.Workable = v.components.workable and v.components.workable:CanBeWorked()
     d.Choppable = d.Workable and v.components.workable.action == GLOBAL.ACTIONS.CHOP
