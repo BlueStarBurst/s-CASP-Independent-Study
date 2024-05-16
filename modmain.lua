@@ -1,5 +1,9 @@
 local DISTANCE = 20
 
+-- Enable Debug Mode (Allow Cltr + R to return to main menu when crashed)
+GLOBAL.CHEATS_ENABLED = true
+GLOBAL.require( 'debugkeys' )
+
 -- A Don't Starve mod that reads the current state of the game and outputs it to a file. This is a mod for the sCASP project.
 local require = GLOBAL.require
 
