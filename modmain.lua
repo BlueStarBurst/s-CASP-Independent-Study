@@ -47,28 +47,11 @@ end
 function GetTimeOfDay()
     local time = GLOBAL.GetClock()
     local current_phase = time:GetPhase()
+    local current_seg = 
 
-    local current_phase_segs = 16
-    if current_phase == "day" then
-        print("Daytime: ", current_phase_segs)
-    elseif current_phase == "night" then
-        print("Nighttime: ", current_phase_segs)
-    elseif current_phase == "dusk" then
-        print("Dusktime: ", current_phase_segs)
-    end
-
-    local current_seg = time:GetNormEraTime() * current_phase_segs
-    if current_phase == "dusk" then
-        current_seg = current_seg + time:GetDaySegs()
-    elseif current_phase == "night" then
-        current_seg = current_seg + time:GetDaySegs() + time:GetDuskSegs()
-    end
-
-    print("Time of day: ", time:GetNormEraTime(), "current seg:", current_seg, "day segs: ", time:GetDaySegs(),
-        "night segs: ", time:GetNightSegs(), "dusk segs: ", time:GetDuskSegs())
     return {
-        hoursInDay = 16,
-        currentHour = current_seg,
+        currentPhase = current_phase, -- day, dusk, night
+        percentagePhasePassed = time:GetNormEraTime(), -- 0 to 1 where 1 is the end of the phase
         timePeriods = {
             day = time:GetDaySegs(),
             night = time:GetNightSegs(),
