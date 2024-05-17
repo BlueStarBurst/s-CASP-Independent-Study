@@ -922,7 +922,7 @@ function PreparePlayerCharacter(player)
             biome = "",
             isInLight = IsPlayerInLight(),
             season = "",
-            timeOfDay = GetTimeOfDay(),
+            time = GetTimeOfDay(),
             -- availableRecipes = BuildableItems(),
             entitiesOnScreen = GetParsedEntities(DISTANCE)
         }

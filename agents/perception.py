@@ -6,7 +6,16 @@ history = "" #!TODO: Implement memmory for the agent of maybe previous action ta
 GUID_SPECIFIC_TAG = ["Hostile", "Fueled", "Harvestable"]
 
 def classify_fraction(fraction, classification=["low", "half", "high"]):
-    return classification[round(fraction*len(classification)) - 1]
+    num_categories = len(classification)
+    segment_size = 1 / num_categories
+    # Calculate the index by finding which segment the fraction falls into
+    index = int(fraction / segment_size)
+    
+    # Handle the edge case where the fraction is exactly 1
+    if index == num_categories:
+        index -= 1
+    
+    return classification[index]
 
 def convert_json_to_predicate(json_string_data: str):
     predicates = []
@@ -75,6 +84,11 @@ def convert_json_to_predicate(json_string_data: str):
     #Health
     predicates.append(f"health({get_status(json_data['health'])})")
     
+    #Time
+    currentPhase = json_data["time"]["currentPhase"]
+    percentagePhase = json_data["time"]["percentagePhase"]
+    predicates.append(f"time({currentPhase}, {classify_fraction(percentagePhase, ['early', 'mid', 'end'])})")
+    
     predicates_str = ""
     for predicate in predicates:
         if predicate[-1] == ".":
@@ -89,7 +103,7 @@ with open("test_data.json", "r") as f:
     data = f.read()
     predicate = convert_json_to_predicate(data)
 
-#Save the predicates to a file
-with open("predicates.pl", "w") as f:
-    f.write(predicate)
+    #Save the predicates to a file
+    with open("predicates.pl", "w") as f:
+        f.write(predicate)
         
