@@ -48,7 +48,9 @@ def convert_json_to_predicate(json_string_data: str):
                 predicate_str = f"{str.lower(k)}({entity['Prefab']})"
                 if predicate_str not in predicates:
                     predicates.append(predicate_str)
-                    
+    for k,v in inventory.items():
+        predicates.append(f"item_in_inventory({k}, {v})")
+        
     #Load the equipped data
     for entity in json_data["equipped"]:
         predicates.append(f"equipment({entity['Prefab']})") 
@@ -65,8 +67,7 @@ def convert_json_to_predicate(json_string_data: str):
                 if predicate_str not in predicates:
                     predicates.append(predicate_str)
     
-    for k,v in inventory.items():
-        predicates.append(f"item_in_inventory({k}, {v})")
+    
     
     #Sanity, Health, Hunger
     def get_status(data):
