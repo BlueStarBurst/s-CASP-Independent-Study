@@ -11,6 +11,7 @@ print("Server started")
 # print all the ip addresses of the server
 print("IP addresses of the server:", socket.gethostbyname_ex(socket.gethostname()))
 
+
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.bind((HOST, PORT))
     def signal_handler(sig, frame):
@@ -27,6 +28,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             while True:
                 data = conn.recv(1024*10000)
                 data = data.decode("utf-8") # decode the data from json
+                
+                print("Received data:", data)
                 
                 with open("data.json", "w") as f:
                     f.write(data)
