@@ -1,30 +1,39 @@
-eat_good_food(A):- hunger(low), good_food(X), item(X, Y).
 
-torch_ingredients(A):- item(cutgrass, X), item(twig, X), X.>=.2.
+good_pick(planted_carrot).
+good_pick(carrot).
+good_pick(axe).
+good_pick(twigs).
+good_pick(flint).
+good_pick(log).
+good_pick(cutgrass).
+good_pick(berrybush).
+good_pick(berries).
 
-axe_ingredients(A):- item(flint, X), item(twig, X), X.>=.1.
 
-campfire_ingredients(A):- item(log, X), X.>=.2, item(cutgrass, Y), Y.>=.3.
+torch_ingredients(A):- item_in_inventory(cutgrass, X), item_in_inventory(twigs, X), X.>=.2.
 
-garland_ingredients(A):- item(petals, X), X.>=.12.
+axe_ingredients(A):- item_in_inventory(flint, X), item_in_inventory(twigs, X), X.>=.1.
 
-%action(Action Name, Priority)
-action(equip_torch_night_hostile, 1) :- time(night), -equipment(torch), item(torch, X).
-action(run_away_from_enemy, 2) :- hostile(X).
-action(eat_maybe_food, 3) :- hunger(low), item(X, N), not good_food(X).
-action(eat_edible_food, 4) :- hunger(low), edible(X), item(X, N).
-action(pick_flower, 5) :- -time(night), sanity(low), on_screen(flower, X).
-action(wander_flower, 6) :- -time(night), sanity(low).
-action(run_to_campfire, 7) :- time(night), on_screen(X, N), fueled(X), X=campfire, X=firepit.
-action(fuel_campfire, 8) :- time(night), on_screen(X, N), fueled(X), X=campfire, X=firepit, fuel(Y), item(Y, N), fuel(Y).
-action(build_campfire, 9) :- time(night_soon), campfire_ingredients(X), -on_screen(campfire, X).
-action(equip_torch_night, 10) :- time(night), item(torch, X), -equipment(torch).
-action(build_torch_night, 11) :- time(night), torch_ingredients(X), -on_screen(campfire, X).
-action(cook_food, 12) :- cookable(X), item(X, N), time(night).
-action(build_axe, 13) :- axe_ingredients(X), -equipment(axe), -item(axe, N).
-action(build_torch, 14) :- torch_ingredients(X), -equipment(torch), -item(torch, N).
-action(equip_axe, 15) :- -equipment(axe), item(axe, N).
-action(chop_tree, 16) :- on_screen(X, N), choppable(X).
-action(pick_anything, 17) :- on_screen(X, N), good_pick(X).
+campfire_ingredients(A):- item_in_inventory(log, X), X.>=.2, item_in_inventory(cutgrass, Y), Y.>=.3.
 
-?- action(A, P).
+garland_ingredients(A):- item_in_inventory(petals, X), X.>=.12.
+
+% action(short_description, functionToUseInLua, FunctionArguments)
+action(equip_torch_night_hostile, equip, GUID) :- time(night, T), not equipment(torch), item_in_inventory(torch, X), hostile(E), slot_in_inventory(torch, GUID).
+action(run_away_from_enemy, run_away, GUID) :- hostile(GUID).
+action(eat_food_low, eat_food, GUID) :- hunger(low), item_in_inventory(X, N), edible(X), slot_in_inventory(X, GUID).
+action(pick_flower, pick_entity, GUID) :- -time(night, T), sanity(low), item_on_screen(flower, GUID).
+action(wander_flower, wander, nil) :- -time(night, T), sanity(low).
+action(walk_to_fueled_campfire, walk_to_entity, GUID) :- time(night, T), item_on_screen(X, GUID), fueled(GUID), isinlight(plr), X=campfire, X=firepit.
+action(build_campfire, build, campfire) :- time(dusk, end), campfire_ingredients(X), -item_on_screen(campfire, X).
+action(equip_torch_night_no_campfire, equip, GUID) :- time(night, T), item_in_inventory(torch, X), not equipment(torch), slot_in_inventory(torch, GUID).
+action(build_torch_night, build, torch) :- time(night), torch_ingredients(X), not item_in_inventory(torch, X).
+action(cook_food, cook, GUID) :- cookable(GUID), slot_in_inventory(X, GUID), time(night).
+action(build_axe, build, axe) :- axe_ingredients(X), not equipment(axe), not item_in_inventory(axe, N).
+action(build_torch, build, torch) :- torch_ingredients(X), not equipment(torch), not item_in_inventory(torch, N).
+action(equip_axe, equip, axe) :- not equipment(axe), item_in_inventory(axe, N), -time(night, T).
+action(pick_log, pick_entity, GUID) :- item_on_screen(log, GUID).
+action(chop_tree, work, GUID) :- item_on_screen(X, GUID), choppable(X), equipment(axe).
+action(pick_anything, pick_entity, GUID) :- item_on_screen(X, GUID), good_pick(X).
+
+?- action(DESC, FUNC, ARGS).
