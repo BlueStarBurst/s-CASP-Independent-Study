@@ -32,8 +32,8 @@ action(cook_food, cook, GUID) :- cookable(GUID), slot_in_inventory(X, GUID), tim
 action(build_axe, build, axe) :- axe_ingredients(X), not equipment(axe), not item_in_inventory(axe, N).
 action(build_torch, build, torch) :- torch_ingredients(X), not equipment(torch), not item_in_inventory(torch, N).
 action(equip_axe, equip, axe) :- not equipment(axe), item_in_inventory(axe, N), -time(night, T).
-action(pick_log, pick_entity, GUID) :- item_on_screen(log, GUID).
+action(pick_log, pickup_entity, GUID) :- item_on_screen(log, GUID).
 action(chop_tree, chop_tree, GUID) :- item_on_screen(X, GUID), choppable(X), equipment(axe).
-action(pick_anything, pick_entity, GUID) :- item_on_screen(X, GUID), good_pick(X).
+action(pick_anything, pickup_entity, GUID) :- item_on_screen(X, GUID), good_pick(X).
 
 % ?- action(DESC, FUNC, ARGS).

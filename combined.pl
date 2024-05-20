@@ -1,69 +1,55 @@
-item_on_screen(campfire, 107478).
-quantity(107478, 1).
-cooker(campfire).
-fueled(107478).
-item_on_screen(crow, 108048).
-quantity(108048, 1).
-cookable(crow).
-item_on_screen(grass, 101463).
-diggable(grass).
-workable(grass).
-quantity(101463, 1).
-pickable(grass).
-item_on_screen(sapling, 101915).
+item_on_screen(sapling, 101789).
 diggable(sapling).
 workable(sapling).
-quantity(101915, 1).
-item_on_screen(evergreen, 105893).
-quantity(105893, 1).
-diggable(evergreen).
+quantity(101789, 1).
+item_on_screen(beehive, 100419).
+quantity(100419, 1).
+item_on_screen(grass, 101136).
+diggable(grass).
+workable(grass).
+quantity(101136, 1).
+pickable(grass).
+item_on_screen(grass, 101080).
+quantity(101080, 1).
+item_on_screen(evergreen, 103457).
+quantity(103457, 1).
 workable(evergreen).
-item_on_screen(rabbithole, 100519).
-quantity(100519, 1).
-diggable(rabbithole).
-workable(rabbithole).
-item_on_screen(evergreen, 105933).
-quantity(105933, 1).
 choppable(evergreen).
-slot_in_inventory(log, 100025).
-fuel(log).
-collectable(log).
-slot_in_inventory(carrot, 100026).
-edible(carrot).
-collectable(carrot).
-cookable(carrot).
-slot_in_inventory(carrot_cooked, 100027).
-edible(carrot_cooked).
-collectable(carrot_cooked).
-slot_in_inventory(pinecone, 100028).
-fuel(pinecone).
-collectable(pinecone).
-slot_in_inventory(flint, 100029).
+item_on_screen(robin, 106500).
+quantity(106500, 1).
+cookable(robin).
+item_on_screen(sapling, 101790).
+quantity(101790, 1).
+pickable(sapling).
+item_on_screen(crow, 106493).
+quantity(106493, 1).
+cookable(crow).
+item_on_screen(robin, 106501).
+quantity(106501, 1).
+item_on_screen(evergreen, 103484).
+quantity(103484, 1).
+item_on_screen(butterfly, 106453).
+quantity(106453, 1).
+workable(butterfly).
+item_on_screen(evergreen, 103474).
+quantity(103474, 1).
+item_on_screen(grass, 101134).
+quantity(101134, 1).
+item_on_screen(rock1, 102594).
+quantity(102594, 1).
+workable(rock1).
+mineable(rock1).
+item_on_screen(evergreen, 103473).
+quantity(103473, 1).
+item_on_screen(grass, 101087).
+quantity(101087, 1).
+slot_in_inventory(flint, 105458).
 collectable(flint).
-slot_in_inventory(meat, 100030).
-edible(meat).
-collectable(meat).
-cookable(meat).
-slot_in_inventory(monstermeat, 100031).
-edible(monstermeat).
-collectable(monstermeat).
-cookable(monstermeat).
-slot_in_inventory(cookedmeat, 100032).
-edible(cookedmeat).
-collectable(cookedmeat).
-item_in_inventory(log, 11).
-item_in_inventory(carrot, 5).
-item_in_inventory(carrot_cooked, 7).
-item_in_inventory(pinecone, 10).
-item_in_inventory(flint, 4).
-item_in_inventory(meat, 4).
-item_in_inventory(monstermeat, 2).
-item_in_inventory(cookedmeat, 15).
-equipment(axe).
-equipment_guid(axe, 100033).
-quantity(100033, 1).
-equippable(axe).
-collectable(axe).
+slot_in_inventory(twigs, 106439).
+fuel(twigs).
+collectable(twigs).
+item_in_inventory(flint, 1).
+item_in_inventory(twigs, 1).
 sanity(high).
 hunger(high).
 health(high).
@@ -103,9 +89,9 @@ action(cook_food, cook, GUID) :- cookable(GUID), slot_in_inventory(X, GUID), tim
 action(build_axe, build, axe) :- axe_ingredients(X), not equipment(axe), not item_in_inventory(axe, N).
 action(build_torch, build, torch) :- torch_ingredients(X), not equipment(torch), not item_in_inventory(torch, N).
 action(equip_axe, equip, axe) :- not equipment(axe), item_in_inventory(axe, N), -time(night, T).
-action(pick_log, pick_entity, GUID) :- item_on_screen(log, GUID).
-action(chop_tree, work, GUID) :- item_on_screen(X, GUID), choppable(X), equipment(axe).
-action(pick_anything, pick_entity, GUID) :- item_on_screen(X, GUID), good_pick(X).
+action(pick_log, pickup_entity, GUID) :- item_on_screen(log, GUID).
+action(chop_tree, chop_tree, GUID) :- item_on_screen(X, GUID), choppable(X), equipment(axe).
+action(pick_anything, pickup_entity, GUID) :- item_on_screen(X, GUID), good_pick(X).
 
 % ?- action(DESC, FUNC, ARGS).
 

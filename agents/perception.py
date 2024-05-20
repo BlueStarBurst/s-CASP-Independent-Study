@@ -88,23 +88,23 @@ def convert_json_to_predicate(json_string_data: str):
     predicates.append(f"health({get_status(json_data['health'])})")
     
     
-    timeOfDay = json_data["timeOfDay"]
-    currentHour = timeOfDay["currentHour"]
-    timePeriods = timeOfDay["timePeriods"]
+    # timeOfDay = json_data["time"]
+    # currentHour = timeOfDay["currentHour"]
+    # timePeriods = timeOfDay["timePeriods"]
     
-    currentPhase = "day"
-    if float(currentHour) >= float(timePeriods["day"]) + float(timePeriods["dusk"]):
-        currentPhase = "night"
-        percentagePhase = (float(currentHour) - float(timePeriods["day"]) - float(timePeriods["dusk"])) / (float(timePeriods["night"]))
-    elif float(currentHour) >= float(timePeriods["day"]):
-        currentPhase = "dusk"
-        percentagePhase = (float(currentHour) - float(timePeriods["day"])) / (float(timePeriods["dusk"]))        
-    else:
-        percentagePhase = (float(currentHour) / float(timePeriods["day"]))
+    # currentPhase = "day"
+    # if float(currentHour) >= float(timePeriods["day"]) + float(timePeriods["dusk"]):
+    #     currentPhase = "night"
+    #     percentagePhase = (float(currentHour) - float(timePeriods["day"]) - float(timePeriods["dusk"])) / (float(timePeriods["night"]))
+    # elif float(currentHour) >= float(timePeriods["day"]):
+    #     currentPhase = "dusk"
+    #     percentagePhase = (float(currentHour) - float(timePeriods["day"])) / (float(timePeriods["dusk"]))        
+    # else:
+    #     percentagePhase = (float(currentHour) / float(timePeriods["day"]))
     
     #Time
-    # currentPhase = json_data["time"]["currentPhase"]
-    # percentagePhase = json_data["time"]["percentagePhase"]
+    currentPhase = json_data["time"]["currentPhase"]
+    percentagePhase = json_data["time"]["percentagePhasePassed"]
     predicates.append(f"time({currentPhase}, {classify_fraction(percentagePhase, ['early', 'mid', 'end'])})")
     
     predicates_str = ""
@@ -155,7 +155,7 @@ def get_action(json_string_data: str):
         print("DESC:", desc)
         print("FUNC:", func)
         print("ARGS:", args)
-        return desc, func, args
+        return desc.strip(), func.strip(), args.strip()
         
         
 with open("test_data.json", "r") as f:

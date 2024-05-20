@@ -317,6 +317,7 @@ function PickEntity(guid)
         local components_string = ""
         for k, v in pairs(entity.components) do
             components_string = components_string .. k .. " "
+            print("AAAAAA",k)
         end
 
         if entity.components.pickable and entity.components.pickable:CanBePicked() then
@@ -365,15 +366,19 @@ function PickUpEntity(guid)
 
         local components_string = ""
         for k, v in pairs(entity.components) do
+            print("BBBBBB",k)
             components_string = components_string .. k .. " "
         end
 
-        if entity.components.pickable and entity.components.pickable:CanBePicked() then
-            print("Picking entity: ", entity.prefab, " can be picked: ", entity.components.pickable:CanBePicked(),
+        if entity.components.inventoryitem and true then
+            print("Picking entity: ", entity.prefab, " can be picked: ", entity.components.inventoryitem,
                 " components: ", components_string)
-            player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, entity, GLOBAL.ACTIONS.PICK, nil, nil,
+            player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, entity, GLOBAL.ACTIONS.PICKUP, nil, nil,
                 nil, 0, nil, 2), true)
             return true
+        else
+            print("Entity cannot be picked: ", entity.prefab, " can be picked: ", entity.components.inventoryitem,
+                " components: ", components_string)
         end
     end
     return false
@@ -513,7 +518,8 @@ end
 function GetEntity(guid)
     local ents = GetNearbyEntities(DISTANCE)
     for k, v in pairs(ents) do
-        if v.GUID == guid and not v:IsInLimbo() then
+        if tostring(v.GUID) == tostring(guid) and not v:IsInLimbo() then
+            print("Entity:", v.prefab, "GUID:", v.GUID, "SERVER:", guid, "BOOL:", tostring(tostring(v.GUID) == tostring(guid)))
             return v
         end
     end
@@ -875,13 +881,9 @@ function PreparePlayerCharacter(player)
 
     end)
 
-    player:DoPeriodicTask(3, function()
-        -- Wander()
-    end)
-
     local isBusy = false
 
-    player:DoPeriodicTask(3, function()
+    player:DoPeriodicTask(1, function()
 
         if isBusy then
             return
@@ -935,69 +937,11 @@ function PreparePlayerCharacter(player)
 
         SendData(str)
         isBusy = true
-        -- local data = ReceiveData()
-
-        -- if currentAction then
-        --     print("Current action: ", currentAction)
-        --     return
-        -- end
-
-        -- if data then
-        --     local tbl = dkjson.decode(data)
-        --     if tbl then
-        --         for k, v in pairs(tbl) do
-        --             if k == "action" then
-
-        --                 print("Action: ", v)
-        --                 -- loadstring("return " .. v)()
-
-        --                 -- if v == "equip_torch_night_hostile" then
-        --                 --     Equip("torch")
-        --                 -- elseif v == "run_away_from_enemy" then
-        --                 --     RunAway("spider") -- no params
-        --                 -- elseif v == "eat_maybe_food" then
-        --                 --     EatFood("carrot") -- no params
-        --                 -- elseif v == "eat_edible_food" then
-        --                 --     EatFood("carrot") -- no params
-        --                 -- elseif v == "pick_flower" then
-        --                 --     PickEntity("flower")
-        --                 -- elseif v == "wander_flower" then
-        --                 --     Wander()
-        --                 -- elseif v == "run_to_campfire" then
-        --                 --     WalkToEntity("campfire")
-        --                 -- elseif v == "fuel_campfire" then
-        --                 --     AddFuel("log") -- no params
-        --                 -- elseif v == "build_campfire" then
-        --                 --     Build("campfire")
-        --                 -- elseif v == "equip_torch_night" then
-        --                 --     Equip("torch")
-        --                 -- elseif v == "build_torch_night" then
-        --                 --     Build("torch")
-        --                 -- elseif v == "cook_food" then
-        --                 --     Cook("meat") -- no params
-        --                 -- elseif v == "pick_anything" then
-        --                 --     PickEntity("flower") -- no params
-        --                 -- elseif v == "build_axe" then
-        --                 --     Build("axe")
-        --                 -- elseif v == "build_torch" then
-        --                 --     Build("torch")
-        --                 -- elseif v == "equip_axe" then
-        --                 --     Equip("axe")
-        --                 -- elseif v == "chop_tree" then
-        --                 --     CutDownTree()
-        --                 -- end
-        --             end
-        --         end
-        --     end
-        -- end
-
     end)
 
-    player:DoPeriodicTask(3, function()
+    player:DoPeriodicTask(1, function()
 
-        if not isBusy then
-            return
-        end
+        
 
         local data = ReceiveData()
 
@@ -1009,54 +953,65 @@ function PreparePlayerCharacter(player)
         if data then
             local tbl = dkjson.decode(data)
             if tbl then
-                for k, v in pairs(tbl) do
-                    if k == "action" then
 
-
-                        print("Action: ", v)
-                        -- loadstring("return " .. v)()
-
-                        if v == "equip_torch_night_hostile" then
-                            Equip("torch")
-                        elseif v == "run_away_from_enemy" then
-                            RunAway("spider") -- no params
-                        elseif v == "eat_maybe_food" then
-                            EatFood("carrot") -- no params
-                        elseif v == "eat_edible_food" then
-                            EatFood("carrot") -- no params
-                        elseif v == "pick_flower" then
-                            PickEntity("flower")
-                        elseif v == "wander_flower" then
-                            Wander()
-                        elseif v == "run_to_campfire" then
-                            WalkToEntity("campfire")
-                        elseif v == "fuel_campfire" then
-                            AddFuel("log") -- no params
-                        elseif v == "build_campfire" then
-                            Build("campfire")
-                        elseif v == "equip_torch_night" then
-                            Equip("torch")
-                        elseif v == "build_torch_night" then
-                            Build("torch")
-                        elseif v == "cook_food" then
-                            Cook("meat") -- no params
-                        elseif v == "pick_anything" then
-                            PickEntity("flower") -- no params
-                        elseif v == "build_axe" then
-                            Build("axe")
-                        elseif v == "build_torch" then
-                            Build("torch")
-                        elseif v == "equip_axe" then
-                            Equip("axe")
-                        elseif v == "chop_tree" then
-                            CutDownTree()
-                        end
-                    end
+                if isBusy then
+                    isBusy = false
+                else
+                    return
                 end
-            end
-        end
 
-        isBusy = false
+                local v = tbl["func"]
+                local arg = tbl["args"]
+
+                print("Action: " .. v .. "Args: " .. arg)
+                -- loadstring("return " .. v)()
+
+                if v == "equip_torch_night_hostile" then
+                    Equip("torch")
+                elseif v == "run_away_from_enemy" then
+                    RunAway("spider") -- no params
+                elseif v == "eat_maybe_food" then
+                    EatFood("carrot") -- no params
+                elseif v == "eat_edible_food" then
+                    EatFood("carrot") -- no params
+                elseif v == "pick_flower" then
+                    PickEntity("flower")
+                elseif v == "pick_entity" then
+                    PickEntity(arg)
+                elseif v == "pickup_entity" then
+                    PickUpEntity(arg)
+                elseif v == "wander_flower" then
+                    Wander()
+                elseif v == "run_to_campfire" then
+                    WalkToEntity("campfire")
+                elseif v == "fuel_campfire" then
+                    AddFuel("log") -- no params
+                elseif v == "build_campfire" then
+                    Build("campfire")
+                elseif v == "equip_torch_night" then
+                    Equip("torch")
+                elseif v == "build_torch_night" then
+                    Build("torch")
+                elseif v == "cook_food" then
+                    Cook("meat") -- no params
+                elseif v == "pick_anything" then
+                    PickEntity("flower") -- no params
+                elseif v == "build_axe" then
+                    Build("axe")
+                elseif v == "build_torch" then
+                    Build("torch")
+                elseif v == "equip_axe" then
+                    Equip("axe")
+                elseif v == "chop_tree" then
+                    CutDownTree()
+                elseif v == "" then
+                    Wander()
+                end
+                    
+                
+            end
+            
+        end
 
     end)
 
