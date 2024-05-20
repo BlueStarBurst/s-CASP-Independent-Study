@@ -82,7 +82,6 @@ good_pick(cutgrass).
 good_pick(berrybush).
 good_pick(berries).
 
-
 torch_ingredients(A):- item_in_inventory(cutgrass, X), item_in_inventory(twigs, X), X >= 2.
 
 axe_ingredients(A):- item_in_inventory(flint, X), item_in_inventory(twigs, X), X >= 1.
@@ -91,7 +90,7 @@ campfire_ingredients(A):- item_in_inventory(log, X), X >= 2, item_in_inventory(c
 
 garland_ingredients(A):- item_in_inventory(petals, X), X >= 12.
 
-% action(short_description, functionToUseInLua, FunctionArguments)
+% scasp(action(short_description, functionToUseInLua, FunctionArguments))
 action(equip_torch_night_hostile, equip, GUID) :- time(night, T), not equipment(torch), item_in_inventory(torch, X), hostile(E), slot_in_inventory(torch, GUID).
 action(run_away_from_enemy, run_away, GUID) :- hostile(GUID).
 action(eat_food_low, eat_food, GUID) :- hunger(low), item_in_inventory(X, N), edible(X), slot_in_inventory(X, GUID).

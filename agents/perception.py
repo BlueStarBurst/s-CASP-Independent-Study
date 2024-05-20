@@ -131,7 +131,7 @@ with open("test_data.json", "r") as f:
         with open("combined.pl", "w") as f:
             f.write(predicate + "\n" + actions)
             f.write("\n")
-            f.write("?- action(DESC, FUNC, ARGS).")
+            f.write("?- scasp(action(DESC, FUNC, ARGS)).")
             
             # run the combined.pl file and get the output using os.system
             os.system("swipl -s combined.pl")
