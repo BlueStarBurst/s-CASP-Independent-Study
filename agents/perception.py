@@ -33,7 +33,7 @@ def convert_json_to_predicate(json_string_data: str):
             elif k in GUID_SPECIFIC_TAG:
                 predicates.append(f"{str.lower(k)}({entity['GUID']})") 
             elif v == True:
-                predicate_str = f"{str.lower(k)}({entity['Prefab']})"
+                predicate_str = f"{str.lower(k)}({entity['Prefab']}, {entity['GUID']})"
                 if predicate_str not in predicates:
                     predicates.append(predicate_str)
     
@@ -137,7 +137,7 @@ def get_action(json_string_data: str):
         # run the combined.pl file and get the output using os.system
         output = run("scasp -n0 combined.pl", shell=True, capture_output=True)
         # print("Action taken", output.stdout.decode("utf-8"))
-        
+        print(output)
         desc = ""
         func = ""
         args = ""
@@ -151,6 +151,7 @@ def get_action(json_string_data: str):
                 func = line.split("FUNC = ")[1]
             elif "ARGS =" in line:
                 args = line.split("ARGS = ")[1]
+                break
                 
         print("DESC:", desc)
         print("FUNC:", func)
