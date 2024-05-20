@@ -33,7 +33,7 @@ def convert_json_to_predicate(json_string_data: str):
             elif k in GUID_SPECIFIC_TAG:
                 predicates.append(f"{str.lower(k)}({entity['GUID']})") 
             elif v == True:
-                predicate_str = f"{str.lower(k)}({entity['Prefab']}, {entity['GUID']})"
+                predicate_str = f"{str.lower(k)}({entity['Prefab']})"
                 if predicate_str not in predicates:
                     predicates.append(predicate_str)
     
@@ -151,12 +151,11 @@ def get_action(json_string_data: str):
                 func = line.split("FUNC = ")[1]
             elif "ARGS =" in line:
                 args = line.split("ARGS = ")[1]
-                break
                 
         print("DESC:", desc)
         print("FUNC:", func)
         print("ARGS:", args)
-        return desc.strip(), func.strip(), args.strip()
+        return desc, func, args
         
         
 with open("test_data.json", "r") as f:

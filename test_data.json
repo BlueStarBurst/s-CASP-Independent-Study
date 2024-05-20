@@ -63,16 +63,32 @@
     "sanity": "200.00 / 200.00 at 0.0000. Penalty of 0.00",
     "season": "",
     "biome": "",
+    "timeOfDay": {
+        "currentHour": 6.9888892533878,
+        "timePeriods": {
+            "night": 3,
+            "day": 8,
+            "dusk": 5
+        },
+        "hoursInDay": 16
+    },
+    "health": "150.00 / 150.00",
     "entitiesOnScreen": [
         {
-            "GUID": 100311,
+            "GUID": 107478,
             "Quantity": 1,
             "Cooker": true,
             "Prefab": "campfire",
             "Fueled": true
         },
         {
-            "GUID": 101048,
+            "GUID": 108048,
+            "Quantity": 1,
+            "Cookable": true,
+            "Prefab": "crow"
+        },
+        {
+            "GUID": 101463,
             "Diggable": true,
             "Workable": true,
             "Quantity": 1,
@@ -80,58 +96,35 @@
             "Prefab": "grass"
         },
         {
-            "GUID": 101805,
+            "GUID": 101915,
             "Diggable": true,
             "Workable": true,
             "Quantity": 1,
             "Prefab": "sapling"
         },
         {
-            "GUID": 104044,
-            "Quantity": 1,
-            "Workable": true,
-            "Choppable": true,
-            "Prefab": "evergreen"
-        },
-        {
-            "GUID": 103724,
+            "GUID": 105893,
             "Quantity": 1,
             "Diggable": true,
             "Workable": true,
             "Prefab": "evergreen"
         },
         {
-            "GUID": 107373,
+            "GUID": 100519,
             "Quantity": 1,
             "Diggable": true,
             "Workable": true,
             "Prefab": "rabbithole"
         },
         {
-            "GUID": 100504,
-            "Quantity": 1,
-            "Pickable": true,
-            "Prefab": "flower"
-        },
-        {
-            "GUID": 104108,
+            "GUID": 105933,
             "Quantity": 1,
             "Workable": true,
             "Choppable": true,
             "Prefab": "evergreen"
         }
     ],
-    "health": "150.00 / 150.00",
-    "time": {
-        "currentPhase": "day",
-        "timePeriods": {
-            "night": 3,
-            "day": 8,
-            "dusk": 5
-        },
-        "percentagePhasePassed": 0.43375002262182
-    },
-    "hunger": "134.06 / 150.00",
+    "hunger": "133.91 / 150.00",
     "equipped": [
         {
             "GUID": 100033,
