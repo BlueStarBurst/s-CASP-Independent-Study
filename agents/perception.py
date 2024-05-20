@@ -87,21 +87,6 @@ def convert_json_to_predicate(json_string_data: str):
     #Health
     predicates.append(f"health({get_status(json_data['health'])})")
     
-    
-    # timeOfDay = json_data["time"]
-    # currentHour = timeOfDay["currentHour"]
-    # timePeriods = timeOfDay["timePeriods"]
-    
-    # currentPhase = "day"
-    # if float(currentHour) >= float(timePeriods["day"]) + float(timePeriods["dusk"]):
-    #     currentPhase = "night"
-    #     percentagePhase = (float(currentHour) - float(timePeriods["day"]) - float(timePeriods["dusk"])) / (float(timePeriods["night"]))
-    # elif float(currentHour) >= float(timePeriods["day"]):
-    #     currentPhase = "dusk"
-    #     percentagePhase = (float(currentHour) - float(timePeriods["day"])) / (float(timePeriods["dusk"]))        
-    # else:
-    #     percentagePhase = (float(currentHour) / float(timePeriods["day"]))
-    
     #Time
     currentPhase = json_data["time"]["currentPhase"]
     percentagePhase = json_data["time"]["percentagePhasePassed"]
@@ -137,6 +122,7 @@ def get_action(json_string_data: str):
         # run the combined.pl file and get the output using os.system
         output = run("scasp -n0 combined.pl", shell=True, capture_output=True)
         # print("Action taken", output.stdout.decode("utf-8"))
+        
         print(output)
         desc = ""
         func = ""
@@ -158,9 +144,9 @@ def get_action(json_string_data: str):
         print("ARGS:", args)
         return desc.strip(), func.strip(), args.strip()
         
-        
-with open("test_data.json", "r") as f:
-    data = f.read()
-    get_action(data)
+if __name__ == "__main__":     
+    with open("test_data.json", "r") as f:
+        data = f.read()
+        get_action(data)
     
         

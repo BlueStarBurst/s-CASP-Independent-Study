@@ -1,3 +1,4 @@
+
 local DISTANCE = 20
 
 -- Enable Debug Mode (Allow Cltr + R to return to main menu when crashed)
@@ -5,9 +6,8 @@ GLOBAL.CHEATS_ENABLED = true
 GLOBAL.require('debugkeys')
 
 -- A Don't Starve mod that reads the current state of the game and outputs it to a file. This is a mod for the sCASP project.
-local require = GLOBAL.require
 
-local socket = require "socket"
+
 local json = require "json"
 local dkjson = require "dkjson"
 
@@ -662,67 +662,6 @@ function IsPlayerInLight()
     end
     return false
 
-end
-
-function Equip(guid)
-    local player = GLOBAL.GetPlayer()
-    local inventory = player.components.inventory
-    local slot = -1
-
-    -- if item is in equipslots, return
-    for k, v in pairs(inventory.equipslots) do
-        if v and v.GUID == guid then
-            return true
-        end
-    end
-
-    for k, v in pairs(inventory.itemslots) do
-        if v and v.GUID == guid then
-            slot = k
-            break
-        end
-    end
-
-    if slot == -1 then
-        return false
-    end
-
-    player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, nil, GLOBAL.ACTIONS.EQUIP,
-        inventory.itemslots[slot], nil, nil, 0, nil, 2), true)
-
-    return true
-end
-
-function EquipByName(item_name)
-    local player = GLOBAL.GetPlayer()
-    local inventory = player.components.inventory
-    local slot = -1
-
-    -- if item is in equipslots, return
-    for k, v in pairs(inventory.equipslots) do
-        if v and v.prefab == item_name then
-            return true
-        end
-    end
-
-    for k, v in pairs(inventory.itemslots) do
-        if v and v.prefab == item_name then
-            slot = k
-            break
-        end
-    end
-
-    if slot == -1 then
-        Build(item_name)
-        return false
-    end
-
-    player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, nil, GLOBAL.ACTIONS.EQUIP,
-        inventory.itemslots[slot], nil, nil, 0, nil, 2), true)
-
-    return true
-end
-
 function CutDownTree()
     local player = GLOBAL.GetPlayer()
     local x, y, z = player.Transform:GetWorldPosition()
@@ -1047,12 +986,4 @@ function PreparePlayerCharacter(player)
         end
 
     end)
-
-    -- debugging help
-    -- GLOBAL.require("consolecommands")
-    -- GLOBAL.c_select(player)
-end
-AddSimPostInit(PreparePlayerCharacter)
-
--- END PLAYER --
 
