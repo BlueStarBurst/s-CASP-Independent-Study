@@ -1,2 +1,1 @@
-scripts/async.lua linguist-vendored
-scripts/dkjson.lua linguist-vendored
+scripts/*.lua linguist-vendored
