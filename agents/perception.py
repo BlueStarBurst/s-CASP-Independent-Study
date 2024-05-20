@@ -1,7 +1,8 @@
-import perception
 import json
 import re
 import os
+from subprocess import run
+
 
 history = "" #!TODO: Implement memmory for the agent of maybe previous action taken
 GUID_SPECIFIC_TAG = ["Hostile", "Fueled", "Harvestable"]
@@ -116,10 +117,10 @@ def convert_json_to_predicate(json_string_data: str):
     return predicates_str
 
 
-with open("test_data.json", "r") as f:
-    data = f.read()
-    predicate = convert_json_to_predicate(data)
 
+def get_action(json_string_data: str):
+    predicate = convert_json_to_predicate(json_string_data)
+    
     #Save the predicates to a file
     with open("predicates.pl", "w") as f:
         f.write(predicate)
@@ -131,9 +132,34 @@ with open("test_data.json", "r") as f:
         with open("combined.pl", "w") as f:
             f.write(predicate + "\n" + actions)
             f.write("\n")
-            f.write("?- scasp(action(DESC, FUNC, ARGS)).")
-            
-            # run the combined.pl file and get the output using os.system
-            os.system("swipl -s combined.pl")
+            f.write("?- action(DESC, FUNC, ARGS).")
+            f.close()
+        # run the combined.pl file and get the output using os.system
+        output = run("scasp -n0 combined.pl", shell=True, capture_output=True)
+        # print("Action taken", output.stdout.decode("utf-8"))
+        
+        desc = ""
+        func = ""
+        args = ""
+        
+        # get line with DESC =
+        output = output.stdout.decode("utf-8").split("\n")
+        for line in output:
+            if "DESC =" in line:
+                desc = line.split("DESC = ")[1]
+            elif "FUNC =" in line:
+                func = line.split("FUNC = ")[1]
+            elif "ARGS =" in line:
+                args = line.split("ARGS = ")[1]
+                
+        print("DESC:", desc)
+        print("FUNC:", func)
+        print("ARGS:", args)
+        return desc, func, args
+        
+        
+with open("test_data.json", "r") as f:
+    data = f.read()
+    get_action(data)
     
         

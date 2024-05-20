@@ -2,6 +2,7 @@ import sys
 import signal
 import socket
 import json
+from perception import get_action
 
 HOST = "127.0.0.1"  # Standard loopback interface address (localhost)
 PORT = 12345  # Port to listen on (non-privileged ports are > 1023)
@@ -38,7 +39,9 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                     break
                 
                 # send json data of action: "chop" to the client
-                data = json.dumps({"action": "chop_tree"})
+                desc, func, args = get_action(data)
+                
+                data = json.dumps({"desc": desc, "func": func, "args": args})
                 # encode to bytes
                 data = data.encode("utf-8")
                 

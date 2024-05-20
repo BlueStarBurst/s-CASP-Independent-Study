@@ -1,6 +1,3 @@
-:- use_module(library(scasp)).
-:- style_check(-singleton).
-
 item_on_screen(campfire, 107478).
 quantity(107478, 1).
 cooker(campfire).
@@ -72,6 +69,7 @@ hunger(high).
 health(high).
 time(day, end).
 
+
 good_pick(planted_carrot).
 good_pick(carrot).
 good_pick(axe).
@@ -82,15 +80,16 @@ good_pick(cutgrass).
 good_pick(berrybush).
 good_pick(berries).
 
-torch_ingredients(A):- item_in_inventory(cutgrass, X), item_in_inventory(twigs, X), X >= 2.
 
-axe_ingredients(A):- item_in_inventory(flint, X), item_in_inventory(twigs, X), X >= 1.
+torch_ingredients(A):- item_in_inventory(cutgrass, X), item_in_inventory(twigs, X), X.>=.2.
 
-campfire_ingredients(A):- item_in_inventory(log, X), X >= 2, item_in_inventory(cutgrass, Y), Y >= 3.
+axe_ingredients(A):- item_in_inventory(flint, X), item_in_inventory(twigs, X), X.>=.1.
 
-garland_ingredients(A):- item_in_inventory(petals, X), X >= 12.
+campfire_ingredients(A):- item_in_inventory(log, X), X.>=.2, item_in_inventory(cutgrass, Y), Y.>=.3.
 
-% scasp(action(short_description, functionToUseInLua, FunctionArguments))
+garland_ingredients(A):- item_in_inventory(petals, X), X.>=.12.
+
+% action(short_description, functionToUseInLua, FunctionArguments)
 action(equip_torch_night_hostile, equip, GUID) :- time(night, T), not equipment(torch), item_in_inventory(torch, X), hostile(E), slot_in_inventory(torch, GUID).
 action(run_away_from_enemy, run_away, GUID) :- hostile(GUID).
 action(eat_food_low, eat_food, GUID) :- hunger(low), item_in_inventory(X, N), edible(X), slot_in_inventory(X, GUID).
@@ -107,3 +106,7 @@ action(equip_axe, equip, axe) :- not equipment(axe), item_in_inventory(axe, N), 
 action(pick_log, pick_entity, GUID) :- item_on_screen(log, GUID).
 action(chop_tree, work, GUID) :- item_on_screen(X, GUID), choppable(X), equipment(axe).
 action(pick_anything, pick_entity, GUID) :- item_on_screen(X, GUID), good_pick(X).
+
+% ?- action(DESC, FUNC, ARGS).
+
+?- action(DESC, FUNC, ARGS).
