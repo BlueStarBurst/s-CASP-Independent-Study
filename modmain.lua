@@ -47,7 +47,7 @@ end
 function GetTimeOfDay()
     local time = GLOBAL.GetClock()
     local current_phase = time:GetPhase()
-    local current_seg = 
+    local current_seg = time:GetSegs()
 
     return {
         currentPhase = current_phase, -- day, dusk, night
