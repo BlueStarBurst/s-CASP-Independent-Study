@@ -9,6 +9,9 @@ diggable(grass).
 workable(grass).
 quantity(101136, 1).
 pickable(grass).
+item_on_screen(butterfly, 106453).
+quantity(106453, 1).
+workable(butterfly).
 item_on_screen(grass, 101080).
 quantity(101080, 1).
 item_on_screen(evergreen, 103457).
@@ -18,19 +21,22 @@ choppable(evergreen).
 item_on_screen(robin, 106500).
 quantity(106500, 1).
 cookable(robin).
+item_on_screen(bee, 106503).
+quantity(106503, 1).
+workable(bee).
 item_on_screen(sapling, 101790).
 quantity(101790, 1).
 pickable(sapling).
 item_on_screen(crow, 106493).
 quantity(106493, 1).
 cookable(crow).
-item_on_screen(robin, 106501).
-quantity(106501, 1).
+item_on_screen(seeds, 106502).
+edible(seeds).
+quantity(106502, 1).
+collectable(seeds).
+cookable(seeds).
 item_on_screen(evergreen, 103484).
 quantity(103484, 1).
-item_on_screen(butterfly, 106453).
-quantity(106453, 1).
-workable(butterfly).
 item_on_screen(evergreen, 103474).
 quantity(103474, 1).
 item_on_screen(grass, 101134).
@@ -39,6 +45,8 @@ item_on_screen(rock1, 102594).
 quantity(102594, 1).
 workable(rock1).
 mineable(rock1).
+item_on_screen(butterfly, 106458).
+quantity(106458, 1).
 item_on_screen(evergreen, 103473).
 quantity(103473, 1).
 item_on_screen(grass, 101087).
