@@ -1,6 +1,7 @@
 import perception
 import json
 import re
+import os
 
 history = "" #!TODO: Implement memmory for the agent of maybe previous action taken
 GUID_SPECIFIC_TAG = ["Hostile", "Fueled", "Harvestable"]
@@ -85,9 +86,24 @@ def convert_json_to_predicate(json_string_data: str):
     #Health
     predicates.append(f"health({get_status(json_data['health'])})")
     
+    
+    timeOfDay = json_data["timeOfDay"]
+    currentHour = timeOfDay["currentHour"]
+    timePeriods = timeOfDay["timePeriods"]
+    
+    currentPhase = "day"
+    if float(currentHour) >= float(timePeriods["day"]) + float(timePeriods["dusk"]):
+        currentPhase = "night"
+        percentagePhase = (float(currentHour) - float(timePeriods["day"]) - float(timePeriods["dusk"])) / (float(timePeriods["night"]))
+    elif float(currentHour) >= float(timePeriods["day"]):
+        currentPhase = "dusk"
+        percentagePhase = (float(currentHour) - float(timePeriods["day"])) / (float(timePeriods["dusk"]))        
+    else:
+        percentagePhase = (float(currentHour) / float(timePeriods["day"]))
+    
     #Time
-    currentPhase = json_data["time"]["currentPhase"]
-    percentagePhase = json_data["time"]["percentagePhase"]
+    # currentPhase = json_data["time"]["currentPhase"]
+    # percentagePhase = json_data["time"]["percentagePhase"]
     predicates.append(f"time({currentPhase}, {classify_fraction(percentagePhase, ['early', 'mid', 'end'])})")
     
     predicates_str = ""
@@ -107,4 +123,17 @@ with open("test_data.json", "r") as f:
     #Save the predicates to a file
     with open("predicates.pl", "w") as f:
         f.write(predicate)
+        
+    # read all lines the predicates from actions.pl
+    with open("agents/v0_HelloWorld_Wilson/action.pl", "r") as f:
+        actions = f.read()
+        # combine the predicates and actions
+        with open("combined.pl", "w") as f:
+            f.write(predicate + "\n" + actions)
+            f.write("\n")
+            f.write("?- action(DESC, FUNC, ARGS).")
+            
+            # run the combined.pl file and get the output using os.system
+            os.system("swipl -s combined.pl")
+    
         

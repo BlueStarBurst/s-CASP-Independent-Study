@@ -36,4 +36,4 @@ action(pick_log, pick_entity, GUID) :- item_on_screen(log, GUID).
 action(chop_tree, work, GUID) :- item_on_screen(X, GUID), choppable(X), equipment(axe).
 action(pick_anything, pick_entity, GUID) :- item_on_screen(X, GUID), good_pick(X).
 
-?- action(DESC, FUNC, ARGS).
+% ?- action(DESC, FUNC, ARGS).
