@@ -157,9 +157,10 @@ def get_action(json_string_data: str):
         print("ARGS:", args)
         return desc, func, args
         
-        
-with open("test_data.json", "r") as f:
-    data = f.read()
-    get_action(data)
+if __name__ == "__main__":    
+    #Load the test data and run it
+    with open("test_data.json", "r") as f:
+        data = f.read()
+        get_action(data)
     
         
