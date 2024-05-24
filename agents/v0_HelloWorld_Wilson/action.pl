@@ -8,6 +8,7 @@ good_pick(log).
 good_pick(cutgrass).
 good_pick(berrybush).
 good_pick(berries).
+good_pick(sapling).
 
 
 torch_ingredients(A):- item_in_inventory(cutgrass, X), item_in_inventory(twigs, X), X.>=.2.
