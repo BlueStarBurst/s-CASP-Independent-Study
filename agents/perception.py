@@ -135,7 +135,7 @@ def get_action(json_string_data: str):
             f.write("?- action(DESC, FUNC, ARGS).")
             f.close()
         # run the combined.pl file and get the output using os.system
-        output = run("scasp -n0 combined.pl", shell=True, capture_output=True)
+        output = run("scasp combined.pl", shell=True, capture_output=True)
         # print("Action taken", output.stdout.decode("utf-8"))
         print(output)
         desc = ""
@@ -157,9 +157,4 @@ def get_action(json_string_data: str):
         print("ARGS:", args)
         return desc, func, args
         
-        
-with open("test_data.json", "r") as f:
-    data = f.read()
-    get_action(data)
-    
         
