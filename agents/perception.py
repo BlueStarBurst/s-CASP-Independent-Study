@@ -19,9 +19,8 @@ def classify_fraction(fraction, classification=["low", "half", "high"]):
     
     return classification[index]
 
-def convert_json_to_predicate(json_string_data: str):
+def convert_json_to_predicate(json_data):
     predicates = []
-    json_data = json.loads(json_string_data)
     # Load the entitiesOnScreen data to predicate
     for entity in json_data["entitiesOnScreen"]:
         predicates.append(f"item_on_screen({entity['Prefab']}, {entity['GUID']})")
@@ -86,21 +85,7 @@ def convert_json_to_predicate(json_string_data: str):
     
     #Health
     predicates.append(f"health({get_status(json_data['health'])})")
-    
-    
-    # timeOfDay = json_data["time"]
-    # currentHour = timeOfDay["currentHour"]
-    # timePeriods = timeOfDay["timePeriods"]
-    
-    # currentPhase = "day"
-    # if float(currentHour) >= float(timePeriods["day"]) + float(timePeriods["dusk"]):
-    #     currentPhase = "night"
-    #     percentagePhase = (float(currentHour) - float(timePeriods["day"]) - float(timePeriods["dusk"])) / (float(timePeriods["night"]))
-    # elif float(currentHour) >= float(timePeriods["day"]):
-    #     currentPhase = "dusk"
-    #     percentagePhase = (float(currentHour) - float(timePeriods["day"])) / (float(timePeriods["dusk"]))        
-    # else:
-    #     percentagePhase = (float(currentHour) / float(timePeriods["day"]))
+
     
     #Time
     currentPhase = json_data["time"]["currentPhase"]
@@ -117,50 +102,43 @@ def convert_json_to_predicate(json_string_data: str):
     return predicates_str
 
 
+cached_rules_data = ""
 
-def get_action(json_string_data: str):
-    predicate = convert_json_to_predicate(json_string_data)
-    
+def get_actionJson_from_predicate(perception_predicate_str: str, save_to_file=False, reload_rules=False):
+    global cached_rules_data
     #Save the predicates to a file
-    with open("predicates.pl", "w") as f:
-        f.write(predicate)
+    if save_to_file:
+        with open("predicates.pl", "w") as f:
+            f.write(perception_predicate_str)
         
     # read all lines the predicates from actions.pl
-    with open("agents/v0_HelloWorld_Wilson/action.pl", "r") as f:
-        actions = f.read()
-        # combine the predicates and actions
-        with open("combined.pl", "w") as f:
-            f.write(predicate + "\n" + actions)
-            f.write("\n")
-            f.write("?- action(DESC, FUNC, ARGS).")
-            f.close()
-        # run the combined.pl file and get the output using os.system
-        output = run("scasp -n0 combined.pl", shell=True, capture_output=True)
-        # print("Action taken", output.stdout.decode("utf-8"))
-        print(output)
-        desc = ""
-        func = ""
-        args = ""
-        
-        # get line with DESC =
-        output = output.stdout.decode("utf-8").split("\n")
-        for line in output:
-            if "DESC =" in line:
-                desc = line.split("DESC = ")[1]
-            elif "FUNC =" in line:
-                func = line.split("FUNC = ")[1]
-            elif "ARGS =" in line:
-                args = line.split("ARGS = ")[1]
-                
-        print("DESC:", desc)
-        print("FUNC:", func)
-        print("ARGS:", args)
-        return desc, func, args
-        
-if __name__ == "__main__":    
-    #Load the test data and run it
-    with open("test_data.json", "r") as f:
-        data = f.read()
-        get_action(data)
+    if cached_rules_data == "" or reload_rules:
+        with open("agents/v0_HelloWorld_Wilson/action.pl", "r") as f:
+            cached_rules_data = f.read()
+
+    with open("combined.pl", "w") as f:
+        f.write(perception_predicate_str + "\n" + cached_rules_data)
+        f.write("\n")
+        f.write("?- action(DESC, FUNC, ARGS).")
+        f.close()
+    # run the combined.pl file and get the output using os.system
+    output = run("scasp combined.pl", shell=True, capture_output=True)
+    # print("Action taken", output.stdout.decode("utf-8"))
+    desc = ""
+    func = ""
+    args = ""
+    
+    # get line with DESC =
+    output = output.stdout.decode("utf-8").split("\n")
+    for line in output:
+        if "DESC =" in line:
+            desc = line.split("DESC = ")[1]
+        elif "FUNC =" in line:
+            func = line.split("FUNC = ")[1]
+        elif "ARGS =" in line:
+            args = line.split("ARGS = ")[1]
+            
+    return {"DESC": desc, "FUNC": func, "ARGS": args}
+
     
         

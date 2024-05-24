@@ -1,7 +1,7 @@
-from perception import get_action
+from perception import convert_json_to_predicate, get_actionJson_from_predicate
 
 HOST = "127.0.0.1"  # Standard loopback interface address (localhost)
-PORT = 48782  # Port to listen on (non-privileged ports are > 1023)
+PORT = 8080  # Port to listen on (non-privileged ports are > 1023)
 
 from fastapi import FastAPI
 from pydantic import BaseModel
@@ -15,7 +15,7 @@ class Data(BaseModel):
     inventory: list
     equipped: list
     entitiesOnScreen: list
-    timeOfDay: dict
+    time: dict
     season: str
     biome: str
 
@@ -30,9 +30,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.post("/action_from_perception/")
-async def get_action(data: Data):
-    return {"action": "wander_flower"}
+@app.get("/action_from_perception/")
+async def get_action(jsonPreceptionData: Data):    
+    predicate = convert_json_to_predicate(jsonPreceptionData.dict())
+    actionJson = get_actionJson_from_predicate(predicate)
+    return actionJson
     
 if __name__ == "__main__":
     import uvicorn
