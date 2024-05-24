@@ -6,18 +6,9 @@ GLOBAL.require( 'debugkeys' )
 
 -- A Don't Starve mod that reads the current state of the game and outputs it to a file. This is a mod for the sCASP project.
 local require = GLOBAL.require
+local dofile = GLOBAL.dofile
 
-local socket = require "socket"
 local json = require "json"
-local dkjson = require "dkjson"
-
-local host = "localhost"
-local port = 12345
-
-local tcp = socket.tcp()
-
--- local client = socket.connect(host, port)
-
 local Text = require "widgets/text"
 
 require "constants"
@@ -25,19 +16,38 @@ require "constants"
 print("sCASP reader modmain.lua loaded")
 
 -- SERVER FUNCTIONS --
+dofile("scriptlibs/socket.lua")
+dofile("scriptlibs/socket/http.lua")
 
-local currentAction = nil
+local socket = require "socket"
+local http = require "socket.http" 
 
-function SendData(data)
-    -- print("Sending data to server")
-    tcp:send(data)
-end
+local mime = require "mime"
+local ltn12 = require "ltn12" 
 
-function ReceiveData()
-    -- print("Receiving data from server")
-    local s, status, partial = tcp:receive()
-    print("Server:", s or partial)
-    return s or partial
+local url = "http://127.0.0.1:48782/action_from_perception"
+
+function PostPerceptionDataForAction(perception_tbl)
+    local body = json.encode(perception_tbl)
+    local response_body = {}
+    local res, code, response_headers, status = http.request {
+        url = url,
+        method = "POST",
+        headers = {
+            ["Content-Type"] = "application/json",
+            ["Content-Length"] = body:len()
+        },
+        source = ltn12.source.string(body),
+        sink = ltn12.sink.table(response_body)
+    }
+
+    if res then
+        print("Response: ", table.concat(response_body))
+        return table.concat(response_body)
+    else
+        print("Error: ", code)
+        return nil
+    end
 end
 
 -- END SERVER FUNCTIONS --
@@ -78,6 +88,7 @@ function CanBuild(item)
 end
 
 function BuildableItems()
+    -- TODO!
     -- get known recipes and put them in a table {axe: [(twigs, 2), (flint, 1)], ...}
     local recipes = GLOBAL.GetAllRecipes()
     local known_recipes = {}
@@ -720,28 +731,6 @@ function CutDownTree()
         return
     end
 
-    -- -- if player has axe equipped, chop down tree
-    -- local inventory = player.components.inventory
-    -- local slot = -1
-    -- for k, v in pairs(inventory.equipslots) do
-    --     if v and v.prefab == "axe" then
-    --         slot = k
-    --         break
-    --     end
-    -- end
-
-    -- if slot == -1 then
-    --     -- if no axe, craft one
-    --     MakeAxe()
-    --     return
-
-    -- end
-
-    -- -- if axe is not equipped, equip it
-    -- if not inventory.equipslots[slot] then
-    --     player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, nil, GLOBAL.ACTIONS.EQUIP, inventory.itemslots[slot], nil, nil, 0, nil, 2), true)
-    -- end
-
     local ents = GLOBAL.TheSim:FindEntities(x, y, z, 10)
     local closest = nil
     local dist = 1000
@@ -859,63 +848,12 @@ end
 -- PLAYER --
 
 function PreparePlayerCharacter(player)
-    -- local numbertext = Text(GLOBAL.BUTTONFONT, 24, "Test") --Make some text
-    -- numbertext:SetColour(1,1,1,1) --Set the colour to white
-    -- The player entity isn't quite ready to equip items yet, so wait one frame
-    player:DoTaskInTime(0, function()
-
-        print("Attempting connection to host '" .. host .. "' and port " .. port .. "...")
-        tcp:connect(host, port);
-        tcp:settimeout(0.1)
-
-        -- Grab a reference to the home campfire
-        local x, y, z = player.Transform:GetWorldPosition()
-
-        print("Player position STARTREADER: ", x, y, z)
-
-    end)
 
     player:DoPeriodicTask(3, function()
-        -- Wander()
-    end)
-
-    local isBusy = false
-
-    player:DoPeriodicTask(3, function()
-
-        if isBusy then
-            return
-        end
-
-        -- if locomotor is currently performing an action, don't read from the server
-
-        local playerfacing = player.Transform:GetRotation()
-        local x, y, z = player.Transform:GetWorldPosition()
-
-        -- print("Health: ", player.components.health:GetDebugString())
-
-        -- GetDistanceFrom("researchlab") -- You need to be closer than 4 units to use it
-        -- PlayerSleep()
-        -- Cook("meat")
-        -- Build("campfire")
-        -- DropStack("cutgrass")
-        -- Build("axe")
-
-        -- print(player.components.health:GetDebugString())
-        -- print(player.components.hunger:GetDebugString())
-        -- print(player.components.sanity:GetDebugString())
-
-        print("Player position: ", x, y, z)
-        local tbl = {
+        local perception_tbl = {
             health = player.components.health:GetDebugString(),
             hunger = player.components.hunger:GetDebugString(),
             sanity = player.components.sanity:GetDebugString(),
-
-            -- position = {
-            --     x = x,
-            --     y = y,
-            --     z = z
-            -- },
 
             inventory = GetInventoryItems(),
             equipped = GetEquippedItems(),
@@ -923,146 +861,80 @@ function PreparePlayerCharacter(player)
             isInLight = IsPlayerInLight(),
             season = "",
             time = GetTimeOfDay(),
-            -- availableRecipes = BuildableItems(),
             entitiesOnScreen = GetParsedEntities(DISTANCE)
         }
 
-        local str = json.encode(tbl, {
-            indent = true
-        })
 
-        -- print(str)
-
-        SendData(str)
-        isBusy = true
-        -- local data = ReceiveData()
-
-        -- if currentAction then
-        --     print("Current action: ", currentAction)
-        --     return
-        -- end
-
-        -- if data then
-        --     local tbl = dkjson.decode(data)
-        --     if tbl then
-        --         for k, v in pairs(tbl) do
-        --             if k == "action" then
-
-        --                 print("Action: ", v)
-        --                 -- loadstring("return " .. v)()
-
-        --                 -- if v == "equip_torch_night_hostile" then
-        --                 --     Equip("torch")
-        --                 -- elseif v == "run_away_from_enemy" then
-        --                 --     RunAway("spider") -- no params
-        --                 -- elseif v == "eat_maybe_food" then
-        --                 --     EatFood("carrot") -- no params
-        --                 -- elseif v == "eat_edible_food" then
-        --                 --     EatFood("carrot") -- no params
-        --                 -- elseif v == "pick_flower" then
-        --                 --     PickEntity("flower")
-        --                 -- elseif v == "wander_flower" then
-        --                 --     Wander()
-        --                 -- elseif v == "run_to_campfire" then
-        --                 --     WalkToEntity("campfire")
-        --                 -- elseif v == "fuel_campfire" then
-        --                 --     AddFuel("log") -- no params
-        --                 -- elseif v == "build_campfire" then
-        --                 --     Build("campfire")
-        --                 -- elseif v == "equip_torch_night" then
-        --                 --     Equip("torch")
-        --                 -- elseif v == "build_torch_night" then
-        --                 --     Build("torch")
-        --                 -- elseif v == "cook_food" then
-        --                 --     Cook("meat") -- no params
-        --                 -- elseif v == "pick_anything" then
-        --                 --     PickEntity("flower") -- no params
-        --                 -- elseif v == "build_axe" then
-        --                 --     Build("axe")
-        --                 -- elseif v == "build_torch" then
-        --                 --     Build("torch")
-        --                 -- elseif v == "equip_axe" then
-        --                 --     Equip("axe")
-        --                 -- elseif v == "chop_tree" then
-        --                 --     CutDownTree()
-        --                 -- end
-        --             end
-        --         end
-        --     end
-        -- end
+        print(PostPerceptionDataForAction(perception_tbl))
 
     end)
 
-    player:DoPeriodicTask(3, function()
+    -- player:DoPeriodicTask(3, function()
 
-        if not isBusy then
-            return
-        end
+    --     if not isBusy then
+    --         return
+    --     end
 
-        local data = ReceiveData()
+    --     local data = ReceiveData()
 
-        if currentAction then
-            print("Current action: ", currentAction)
-            return
-        end
+    --     if currentAction then
+    --         print("Current action: ", currentAction)
+    --         return
+    --     end
 
-        if data then
-            local tbl = dkjson.decode(data)
-            if tbl then
-                for k, v in pairs(tbl) do
-                    if k == "action" then
+    --     if data then
+    --         local tbl = json.decode(data)
+    --         if tbl then
+    --             for k, v in pairs(tbl) do
+    --                 if k == "action" then
 
 
-                        print("Action: ", v)
-                        -- loadstring("return " .. v)()
+    --                     print("Action: ", v)
+    --                     -- loadstring("return " .. v)()
 
-                        if v == "equip_torch_night_hostile" then
-                            Equip("torch")
-                        elseif v == "run_away_from_enemy" then
-                            RunAway("spider") -- no params
-                        elseif v == "eat_maybe_food" then
-                            EatFood("carrot") -- no params
-                        elseif v == "eat_edible_food" then
-                            EatFood("carrot") -- no params
-                        elseif v == "pick_flower" then
-                            PickEntity("flower")
-                        elseif v == "wander_flower" then
-                            Wander()
-                        elseif v == "run_to_campfire" then
-                            WalkToEntity("campfire")
-                        elseif v == "fuel_campfire" then
-                            AddFuel("log") -- no params
-                        elseif v == "build_campfire" then
-                            Build("campfire")
-                        elseif v == "equip_torch_night" then
-                            Equip("torch")
-                        elseif v == "build_torch_night" then
-                            Build("torch")
-                        elseif v == "cook_food" then
-                            Cook("meat") -- no params
-                        elseif v == "pick_anything" then
-                            PickEntity("flower") -- no params
-                        elseif v == "build_axe" then
-                            Build("axe")
-                        elseif v == "build_torch" then
-                            Build("torch")
-                        elseif v == "equip_axe" then
-                            Equip("axe")
-                        elseif v == "chop_tree" then
-                            CutDownTree()
-                        end
-                    end
-                end
-            end
-        end
+    --                     if v == "equip_torch_night_hostile" then
+    --                         Equip("torch")
+    --                     elseif v == "run_away_from_enemy" then
+    --                         RunAway("spider") -- no params
+    --                     elseif v == "eat_maybe_food" then
+    --                         EatFood("carrot") -- no params
+    --                     elseif v == "eat_edible_food" then
+    --                         EatFood("carrot") -- no params
+    --                     elseif v == "pick_flower" then
+    --                         PickEntity("flower")
+    --                     elseif v == "wander_flower" then
+    --                         Wander()
+    --                     elseif v == "run_to_campfire" then
+    --                         WalkToEntity("campfire")
+    --                     elseif v == "fuel_campfire" then
+    --                         AddFuel("log") -- no params
+    --                     elseif v == "build_campfire" then
+    --                         Build("campfire")
+    --                     elseif v == "equip_torch_night" then
+    --                         Equip("torch")
+    --                     elseif v == "build_torch_night" then
+    --                         Build("torch")
+    --                     elseif v == "cook_food" then
+    --                         Cook("meat") -- no params
+    --                     elseif v == "pick_anything" then
+    --                         PickEntity("flower") -- no params
+    --                     elseif v == "build_axe" then
+    --                         Build("axe")
+    --                     elseif v == "build_torch" then
+    --                         Build("torch")
+    --                     elseif v == "equip_axe" then
+    --                         Equip("axe")
+    --                     elseif v == "chop_tree" then
+    --                         CutDownTree()
+    --                     end
+    --                 end
+    --             end
+    --         end
+    --     end
 
-        isBusy = false
+    --     isBusy = false
 
-    end)
-
-    -- debugging help
-    -- GLOBAL.require("consolecommands")
-    -- GLOBAL.c_select(player)
+    -- end)
 end
 AddSimPostInit(PreparePlayerCharacter)
 
