@@ -35,5 +35,6 @@ action(equip_axe, equip, axe) :- not equipment(axe), item_in_inventory(axe, N), 
 action(pick_log, pick_entity, GUID) :- item_on_screen(log, GUID).
 action(chop_tree, chop_tree, GUID) :- item_on_screen(X, GUID), choppable(X), equipment(axe).
 action(pick_anything, pick_entity, GUID) :- item_on_screen(X, GUID), good_pick(X).
+action(wander, wander, nil) :- -time(night, T).
 
 % ?- action(DESC, FUNC, ARGS).
