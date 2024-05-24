@@ -32,7 +32,7 @@ app.add_middleware(
 
 @app.post("/action_from_perception/")
 async def get_action(data: Data):
-    return data
+    return {"action": "wander_flower"}
     
 if __name__ == "__main__":
     import uvicorn
