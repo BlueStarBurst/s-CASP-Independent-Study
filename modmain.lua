@@ -2,6 +2,7 @@ local DISTANCE = 20
 
 -- Enable Debug Mode (Allow Cltr + R to return to main menu when crashed)
 GLOBAL.CHEATS_ENABLED = true
+
 GLOBAL.require( 'debugkeys' )
 
 -- A Don't Starve mod that reads the current state of the game and outputs it to a file. This is a mod for the sCASP project.
@@ -20,19 +21,20 @@ dofile("scriptlibs/socket.lua")
 dofile("scriptlibs/socket/http.lua")
 
 local socket = require "socket"
-local http = require "socket.http" 
+local http = require "socket.http"
 
 local mime = require "mime"
 local ltn12 = require "ltn12" 
 
-local url = "http://127.0.0.1:48782/action_from_perception"
+local url = "http://127.0.0.1:8080/action_from_perception/"
 
 function PostPerceptionDataForAction(perception_tbl)
     local body = json.encode(perception_tbl)
     local response_body = {}
+
     local res, code, response_headers, status = http.request {
         url = url,
-        method = "POST",
+        method = "GET",
         headers = {
             ["Content-Type"] = "application/json",
             ["Content-Length"] = body:len()
@@ -42,7 +44,7 @@ function PostPerceptionDataForAction(perception_tbl)
     }
 
     if res then
-        print("Response: ", table.concat(response_body))
+        print("HTTPCode: ", code , ", Response: ", table.concat(response_body))
         return table.concat(response_body)
     else
         print("Error: ", code)
@@ -849,7 +851,12 @@ end
 
 function PreparePlayerCharacter(player)
 
+    local isBusy = false
     player:DoPeriodicTask(3, function()
+        if isBusy then
+            return
+        end
+        isBusy = true
         local perception_tbl = {
             health = player.components.health:GetDebugString(),
             hunger = player.components.hunger:GetDebugString(),
@@ -863,78 +870,13 @@ function PreparePlayerCharacter(player)
             time = GetTimeOfDay(),
             entitiesOnScreen = GetParsedEntities(DISTANCE)
         }
-
-
+        
         print(PostPerceptionDataForAction(perception_tbl))
+        -- !TODO: get action from the server and do the action.
+        -- Return are: 
 
+        isBusy = false
     end)
-
-    -- player:DoPeriodicTask(3, function()
-
-    --     if not isBusy then
-    --         return
-    --     end
-
-    --     local data = ReceiveData()
-
-    --     if currentAction then
-    --         print("Current action: ", currentAction)
-    --         return
-    --     end
-
-    --     if data then
-    --         local tbl = json.decode(data)
-    --         if tbl then
-    --             for k, v in pairs(tbl) do
-    --                 if k == "action" then
-
-
-    --                     print("Action: ", v)
-    --                     -- loadstring("return " .. v)()
-
-    --                     if v == "equip_torch_night_hostile" then
-    --                         Equip("torch")
-    --                     elseif v == "run_away_from_enemy" then
-    --                         RunAway("spider") -- no params
-    --                     elseif v == "eat_maybe_food" then
-    --                         EatFood("carrot") -- no params
-    --                     elseif v == "eat_edible_food" then
-    --                         EatFood("carrot") -- no params
-    --                     elseif v == "pick_flower" then
-    --                         PickEntity("flower")
-    --                     elseif v == "wander_flower" then
-    --                         Wander()
-    --                     elseif v == "run_to_campfire" then
-    --                         WalkToEntity("campfire")
-    --                     elseif v == "fuel_campfire" then
-    --                         AddFuel("log") -- no params
-    --                     elseif v == "build_campfire" then
-    --                         Build("campfire")
-    --                     elseif v == "equip_torch_night" then
-    --                         Equip("torch")
-    --                     elseif v == "build_torch_night" then
-    --                         Build("torch")
-    --                     elseif v == "cook_food" then
-    --                         Cook("meat") -- no params
-    --                     elseif v == "pick_anything" then
-    --                         PickEntity("flower") -- no params
-    --                     elseif v == "build_axe" then
-    --                         Build("axe")
-    --                     elseif v == "build_torch" then
-    --                         Build("torch")
-    --                     elseif v == "equip_axe" then
-    --                         Equip("axe")
-    --                     elseif v == "chop_tree" then
-    --                         CutDownTree()
-    --                     end
-    --                 end
-    --             end
-    --         end
-    --     end
-
-    --     isBusy = false
-
-    -- end)
 end
 AddSimPostInit(PreparePlayerCharacter)
 
