@@ -317,7 +317,6 @@ function pick_entity(guid)
         local components_string = ""
         for k, v in pairs(entity.components) do
             components_string = components_string .. k .. " "
-            print("AAAAAA", k)
         end
 
         if entity.components.pickable and entity.components.pickable:CanBePicked() then
