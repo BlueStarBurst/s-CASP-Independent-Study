@@ -60,7 +60,7 @@ function GetTimeOfDay()
     }
 end
 
-function CanBuild(item)
+function Canbuild(item)
     local player = GLOBAL.GetPlayer()
     local inventory = player.components.inventory
     local recipes = GLOBAL.GetAllRecipes()
@@ -89,8 +89,8 @@ function BuildableItems()
     -- return known_recipes
 end
 
-function Build(item)
-    if not CanBuild(item) then
+function build(item)
+    if not Canbuild(item) then
         print("Cannot craft item: ", item)
 
         -- get each ingredient in the recipe
@@ -112,24 +112,24 @@ function Build(item)
                         if PickEntityByName("sapling") then
                             return true
                         else
-                            Wander()
+                            wander()
                         end
                     elseif ingredient == "cutgrass" then
                         if PickEntityByName("grass") then
                             return true
                         else
-                            Wander()
+                            wander()
                         end
                     else
                         if PickUpEntityByName(ingredient) then
                             return true
                         else
-                            Wander()
+                            wander()
                         end
                     end
                     -- else
                     --     print("Ingredient: ", ingredient, " amount: ", amount)
-                    --     Wander()
+                    --     wander()
                     -- end
                 end
             end
@@ -182,7 +182,7 @@ function WalkInAngle(angle, distance)
     WalkToXYZ(x + dx, y, z + dz)
 end
 
-function WalkToEntity(guid)
+function walk_to_entity(guid)
     local entity = GetEntity(guid)
     if entity then
         local x, y, z = entity.Transform:GetWorldPosition()
@@ -198,7 +198,7 @@ function WalkToEntityByName(entity_name)
     end
 end
 
-function Wander()
+function wander()
     local player = GLOBAL.GetPlayer()
 
     if player.components.locomotor:HasDestination() then
@@ -306,7 +306,7 @@ function GetParsedEntities(distance)
     return parsed_ents
 end
 
-function PickEntity(guid)
+function pick_entity(guid)
     local entity = GetEntity(guid)
     if entity then
         -- BufferedAction
@@ -370,7 +370,7 @@ function PickEntityByName(entity_name)
     return false
 end
 
-function PickUpEntity(guid)
+function pick_up_entity(guid)
     local entity = GetEntity(guid)
     if entity then
         -- BufferedAction
@@ -453,7 +453,7 @@ function PlayerSleep()
     end
 end
 
-function Cook()
+function cook()
     local player = GLOBAL.GetPlayer()
 
     local inv_items = GetInventoryItems()
@@ -664,7 +664,7 @@ function IsPlayerInLight()
 
 end
 
-function Equip(guid)
+function equip(guid)
     local player = GLOBAL.GetPlayer()
     local inventory = player.components.inventory
     local slot = -1
@@ -713,7 +713,7 @@ function EquipByName(item_name)
     end
 
     if slot == -1 then
-        Build(item_name)
+        build(item_name)
         return false
     end
 
@@ -723,7 +723,7 @@ function EquipByName(item_name)
     return true
 end
 
-function CutDownTree()
+function cut_down_tree()
     local player = GLOBAL.GetPlayer()
     local x, y, z = player.Transform:GetWorldPosition()
 
@@ -783,7 +783,7 @@ function CutDownTree()
         player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, closest, GLOBAL.ACTIONS.CHOP, nil, nil,
             nil, 0, nil, 2), true)
     else
-        Wander()
+        wander()
     end
 end
 
@@ -810,7 +810,7 @@ function RunAwayByName(entity_name)
     end
 end
 
-function RunAway(guid)
+function run_away(guid)
     local player = GLOBAL.GetPlayer()
     local x, y, z = player.Transform:GetWorldPosition()
 
@@ -833,7 +833,7 @@ function RunAway(guid)
     end
 end
 
-function EatFood(guid)
+function eat_food(guid)
     local player = GLOBAL.GetPlayer()
     local inventory = player.components.inventory
     local slot = -1
@@ -873,7 +873,7 @@ function EatFoodByName(item_name)
     return true
 end
 
-function AddFuel()
+function add_fuel()
     local player = GLOBAL.GetPlayer()
     local inventory = player.components.inventory
     local slot = -1
@@ -932,10 +932,10 @@ function PreparePlayerCharacter(player)
 
         -- GetDistanceFrom("researchlab") -- You need to be closer than 4 units to use it
         -- PlayerSleep()
-        -- Cook("meat")
-        -- Build("campfire")
+        -- cook("meat")
+        -- build("campfire")
         -- DropStack("cutgrass")
-        -- Build("axe")
+        -- build("axe")
 
         -- print(player.components.health:GetDebugString())
         -- print(player.components.hunger:GetDebugString())
@@ -999,47 +999,47 @@ function PreparePlayerCharacter(player)
                 -- loadstring("return " .. v)()
 
                 if v == "equip_torch_night_hostile" then
-                    Equip("torch")
+                    equip("torch")
                 elseif v == "run_away" then
-                    RunAway(arg) -- no params
+                    run_away(arg) -- no params
                 elseif v == "eat_food" then
-                    EatFood(arg) -- no params
+                    eat_food(arg) -- no params
                 elseif v == "eat_edible_food" then
-                    EatFood("carrot") -- no params
+                    eat_food("carrot") -- no params
                 elseif v == "pick_flower" then
-                    PickEntity("flower")
+                    pick_entity("flower")
                 elseif v == "pick_entity" then
-                    PickEntity(arg)
+                    pick_entity(arg)
                 elseif v == "pickup_entity" then
-                    PickUpEntity(arg)
+                    pick_up_entity(arg)
                 elseif v == "wander_flower" then
-                    Wander()
+                    wander()
                 elseif v == "run_to_campfire" then
-                    WalkToEntity("campfire")
+                    walk_to_entity("campfire")
                 elseif v == "fuel_campfire" then
-                    AddFuel("log") -- no params
+                    add_fuel("log") -- no params
                 elseif v == "build_campfire" then
-                    Build("campfire")
+                    build("campfire")
                 elseif v == "equip_torch_night" then
-                    Equip("torch")
+                    equip("torch")
                 elseif v == "build_torch_night" then
-                    Build("torch")
+                    build("torch")
                 elseif v == "cook_food" then
-                    Cook("meat") -- no params
+                    cook("meat") -- no params
                 elseif v == "pick_anything" then
-                    PickEntity("flower") -- no params
+                    pick_entity("flower") -- no params
                 elseif v == "build_axe" then
-                    Build("axe")
+                    build("axe")
                 elseif v == "build_torch" then
-                    Build("torch")
+                    build("torch")
                 elseif v == "equip_axe" then
-                    Equip("axe")
+                    equip("axe")
                 elseif v == "chop_tree" then
-                    CutDownTree()
+                    cut_down_tree()
                 elseif v == "build" then
-                    Build(arg)
+                    build(arg)
                 elseif v == "" then
-                    Wander()
+                    wander()
                 end
 
             end
