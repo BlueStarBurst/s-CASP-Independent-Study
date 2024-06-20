@@ -28,6 +28,8 @@ print("sCASP reader modmain.lua loaded")
 
 local currentAction = nil
 
+local functions = {}
+
 function SendData(data)
     -- print("Sending data to server")
     tcp:send(data)
@@ -36,7 +38,7 @@ end
 function ReceiveData()
     -- print("Receiving data from server")
     local s, status, partial = tcp:receive()
-    print("Server:", s or partial)
+    -- print("Server:", s or partial)
     return s or partial
 end
 
@@ -89,7 +91,7 @@ function BuildableItems()
     -- return known_recipes
 end
 
-function build(item)
+function functions.build(item)
     if not Canbuild(item) then
         print("Cannot craft item: ", item)
 
@@ -182,7 +184,7 @@ function WalkInAngle(angle, distance)
     WalkToXYZ(x + dx, y, z + dz)
 end
 
-function walk_to_entity(guid)
+function functions.walk_to_entity(guid)
     local entity = GetEntity(guid)
     if entity then
         local x, y, z = entity.Transform:GetWorldPosition()
@@ -198,7 +200,7 @@ function WalkToEntityByName(entity_name)
     end
 end
 
-function wander()
+function functions.wander()
     local player = GLOBAL.GetPlayer()
 
     if player.components.locomotor:HasDestination() then
@@ -306,7 +308,7 @@ function GetParsedEntities(distance)
     return parsed_ents
 end
 
-function pick_entity(guid)
+function functions.pick_entity(guid)
     local entity = GetEntity(guid)
     if entity then
         -- BufferedAction
@@ -369,7 +371,7 @@ function PickEntityByName(entity_name)
     return false
 end
 
-function pick_up_entity(guid)
+function functions.pick_up_entity(guid)
     local entity = GetEntity(guid)
     if entity then
         -- BufferedAction
@@ -452,7 +454,7 @@ function PlayerSleep()
     end
 end
 
-function cook()
+function functions.cook()
     local player = GLOBAL.GetPlayer()
 
     local inv_items = GetInventoryItems()
@@ -663,7 +665,7 @@ function IsPlayerInLight()
 
 end
 
-function equip(guid)
+function functions.equip(guid)
     local player = GLOBAL.GetPlayer()
     local inventory = player.components.inventory
     local slot = -1
@@ -722,7 +724,7 @@ function EquipByName(item_name)
     return true
 end
 
-function cut_down_tree()
+function functions.cut_down_tree()
     local player = GLOBAL.GetPlayer()
     local x, y, z = player.Transform:GetWorldPosition()
 
@@ -786,6 +788,56 @@ function cut_down_tree()
     end
 end
 
+function functions.chop_tree(guid)
+
+    print("Chopping tree: ", guid)
+
+    local player = GLOBAL.GetPlayer()
+    local x, y, z = player.Transform:GetWorldPosition()
+
+    -- if logs or pinecones are on the ground, pick them up
+    local ents = GLOBAL.TheSim:FindEntities(x, y, z, 10)
+    for k, v in pairs(ents) do
+        if v.prefab == "log" or v.prefab == "pinecone" then
+            if PickUpEntityByName(v.prefab) == true then
+                return
+            end
+        end
+    end
+
+    if not EquipByName("axe") then
+        return
+    end
+
+    -- if player has axe equipped, chop down tree
+    local inventory = player.components.inventory
+    local slot = -1
+    for k, v in pairs(inventory.equipslots) do
+        if v and v.prefab == "axe" then
+            slot = k
+            break
+        end
+    end
+
+    if slot == -1 then
+        -- if no axe, craft one
+        MakeAxe()
+        return
+
+    end
+
+    -- if axe is not equipped, equip it
+    if not inventory.equipslots[slot] then
+        player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, nil, GLOBAL.ACTIONS.EQUIP, inventory.itemslots[slot], nil, nil, 0, nil, 2), true)
+    end
+
+    -- chop down the tree with guid
+    local entity = GetEntity(guid)
+    if entity then
+        player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, entity, GLOBAL.ACTIONS.CHOP, nil, nil, nil, 0, nil, 2), true)
+    end
+end
+
 function RunAwayByName(entity_name)
     local player = GLOBAL.GetPlayer()
     local x, y, z = player.Transform:GetWorldPosition()
@@ -809,7 +861,7 @@ function RunAwayByName(entity_name)
     end
 end
 
-function run_away(guid)
+function functions.run_away(guid)
     local player = GLOBAL.GetPlayer()
     local x, y, z = player.Transform:GetWorldPosition()
 
@@ -832,7 +884,7 @@ function run_away(guid)
     end
 end
 
-function eat_food(guid)
+function functions.eat_food(guid)
     local player = GLOBAL.GetPlayer()
     local inventory = player.components.inventory
     local slot = -1
@@ -872,7 +924,7 @@ function EatFoodByName(item_name)
     return true
 end
 
-function add_fuel()
+function functions.add_fuel()
     local player = GLOBAL.GetPlayer()
     local inventory = player.components.inventory
     local slot = -1
@@ -995,51 +1047,65 @@ function PreparePlayerCharacter(player)
                 local arg = tbl["args"]
 
                 print("Action: " .. v .. "Args: " .. arg)
-                -- loadstring("return " .. v)()
 
-                if v == "equip_torch_night_hostile" then
-                    equip("torch")
-                elseif v == "run_away" then
-                    run_away(arg) -- no params
-                elseif v == "eat_food" then
-                    eat_food(arg) -- no params
-                elseif v == "eat_edible_food" then
-                    eat_food("carrot") -- no params
-                elseif v == "pick_flower" then
-                    pick_entity("flower")
-                elseif v == "pick_entity" then
-                    pick_entity(arg)
-                elseif v == "pickup_entity" then
-                    pick_up_entity(arg)
-                elseif v == "wander_flower" then
-                    wander()
-                elseif v == "run_to_campfire" then
-                    walk_to_entity("campfire")
-                elseif v == "fuel_campfire" then
-                    add_fuel("log") -- no params
-                elseif v == "build_campfire" then
-                    build("campfire")
-                elseif v == "equip_torch_night" then
-                    equip("torch")
-                elseif v == "build_torch_night" then
-                    build("torch")
-                elseif v == "cook_food" then
-                    cook("meat") -- no params
-                elseif v == "pick_anything" then
-                    pick_entity("flower") -- no params
-                elseif v == "build_axe" then
-                    build("axe")
-                elseif v == "build_torch" then
-                    build("torch")
-                elseif v == "equip_axe" then
-                    equip("axe")
-                elseif v == "chop_tree" then
-                    cut_down_tree()
-                elseif v == "build" then
-                    build(arg)
-                elseif v == "" then
-                    wander()
+                -- for k, v in pairs(_G) do
+                --     print(k, v)
+                -- end
+
+                -- run the function with the arguments ex: chop_tree(103812)
+                -- _G[v](arg)
+                local func = functions[v]
+                if func then
+                    print("Running function: ", v)
+                    func(arg)
                 end
+                
+                -- print list of functions in the global scope
+               
+
+                -- if v == "equip_torch_night_hostile" then
+                --     equip("torch")
+                -- elseif v == "run_away" then
+                --     run_away(arg) -- no params
+                -- elseif v == "eat_food" then
+                --     eat_food(arg) -- no params
+                -- elseif v == "eat_edible_food" then
+                --     eat_food("carrot") -- no params
+                -- elseif v == "pick_flower" then
+                --     pick_entity("flower")
+                -- elseif v == "pick_entity" then
+                --     pick_entity(arg)
+                -- elseif v == "pickup_entity" then
+                --     pick_up_entity(arg)
+                -- elseif v == "wander_flower" then
+                --     wander()
+                -- elseif v == "run_to_campfire" then
+                --     walk_to_entity("campfire")
+                -- elseif v == "fuel_campfire" then
+                --     add_fuel("log") -- no params
+                -- elseif v == "build_campfire" then
+                --     build("campfire")
+                -- elseif v == "equip_torch_night" then
+                --     equip("torch")
+                -- elseif v == "build_torch_night" then
+                --     build("torch")
+                -- elseif v == "cook_food" then
+                --     cook("meat") -- no params
+                -- elseif v == "pick_anything" then
+                --     pick_entity("flower") -- no params
+                -- elseif v == "build_axe" then
+                --     build("axe")
+                -- elseif v == "build_torch" then
+                --     build("torch")
+                -- elseif v == "equip_axe" then
+                --     equip("axe")
+                -- elseif v == "chop_tree" then
+                --     cut_down_tree()
+                -- elseif v == "build" then
+                --     build(arg)
+                -- elseif v == "" then
+                --     wander()
+                -- end
 
             end
 

@@ -1,94 +1,116 @@
-item_on_screen(grass, 101191).
-diggable(grass, 101191).
-workable(grass, 101191).
-quantity(101191, 1).
-item_on_screen(rabbithole, 100253).
-quantity(100253, 1).
-diggable(rabbithole, 100253).
-workable(rabbithole, 100253).
-item_on_screen(rabbithole, 100257).
-quantity(100257, 1).
-diggable(rabbithole, 100257).
-workable(rabbithole, 100257).
-item_on_screen(rabbithole, 100258).
-quantity(100258, 1).
-diggable(rabbithole, 100258).
-workable(rabbithole, 100258).
-item_on_screen(grass, 101151).
-diggable(grass, 101151).
-workable(grass, 101151).
-quantity(101151, 1).
-item_on_screen(robin, 106538).
-quantity(106538, 1).
-cookable(robin, 106538).
-item_on_screen(rabbithole, 100260).
-quantity(100260, 1).
-diggable(rabbithole, 100260).
-workable(rabbithole, 100260).
-item_on_screen(grass, 101199).
-diggable(grass, 101199).
-workable(grass, 101199).
-quantity(101199, 1).
-item_on_screen(grass, 101159).
-diggable(grass, 101159).
-workable(grass, 101159).
-quantity(101159, 1).
-item_on_screen(grass, 101135).
-diggable(grass, 101135).
-workable(grass, 101135).
-quantity(101135, 1).
-item_on_screen(rabbithole, 100259).
-quantity(100259, 1).
-diggable(rabbithole, 100259).
-workable(rabbithole, 100259).
-item_on_screen(grass, 101239).
-diggable(grass, 101239).
-workable(grass, 101239).
-quantity(101239, 1).
-item_on_screen(rabbithole, 100254).
-quantity(100254, 1).
-diggable(rabbithole, 100254).
-workable(rabbithole, 100254).
-item_on_screen(evergreen, 103408).
-quantity(103408, 1).
-workable(evergreen, 103408).
-choppable(evergreen, 103408).
-slot_in_inventory(seeds, 100025).
-edible(seeds).
-collectable(seeds).
-cookable(seeds).
-slot_in_inventory(twigs, 100026).
-fuel(twigs).
-collectable(twigs).
-slot_in_inventory(flint, 100027).
-collectable(flint).
-slot_in_inventory(carrot, 100028).
+item_on_screen(evergreen, 103815).
+quantity(103815, 1).
+workable(evergreen, 103815).
+choppable(evergreen, 103815).
+item_on_screen(flower, 100671).
+quantity(100671, 1).
+pickable(flower, 100671).
+item_on_screen(evergreen, 106345).
+quantity(106345, 1).
+workable(evergreen, 106345).
+choppable(evergreen, 106345).
+item_on_screen(grass, 101071).
+diggable(grass, 101071).
+workable(grass, 101071).
+quantity(101071, 1).
+item_on_screen(sapling, 102488).
+diggable(sapling, 102488).
+workable(sapling, 102488).
+quantity(102488, 1).
+pickable(sapling, 102488).
+item_on_screen(sapling, 102486).
+diggable(sapling, 102486).
+workable(sapling, 102486).
+quantity(102486, 1).
+pickable(sapling, 102486).
+item_on_screen(rabbit, 102019).
+quantity(102019, 1).
+cookable(rabbit, 102019).
+item_on_screen(flower, 100672).
+quantity(100672, 1).
+pickable(flower, 100672).
+item_on_screen(butterfly, 108066).
+quantity(108066, 1).
+workable(butterfly, 108066).
+item_on_screen(rabbithole, 107335).
+quantity(107335, 1).
+diggable(rabbithole, 107335).
+workable(rabbithole, 107335).
+item_on_screen(rabbit, 102138).
+quantity(102138, 1).
+cookable(rabbit, 102138).
+item_on_screen(rabbithole, 107334).
+quantity(107334, 1).
+diggable(rabbithole, 107334).
+workable(rabbithole, 107334).
+item_on_screen(wormhole, 101809).
+quantity(101809, 1).
+item_on_screen(grass, 101411).
+diggable(grass, 101411).
+workable(grass, 101411).
+quantity(101411, 1).
+pickable(grass, 101411).
+item_on_screen(grass, 101395).
+diggable(grass, 101395).
+workable(grass, 101395).
+quantity(101395, 1).
+pickable(grass, 101395).
+item_on_screen(sapling, 102490).
+diggable(sapling, 102490).
+workable(sapling, 102490).
+quantity(102490, 1).
+pickable(sapling, 102490).
+item_on_screen(evergreen, 104589).
+quantity(104589, 1).
+workable(evergreen, 104589).
+choppable(evergreen, 104589).
+slot_in_inventory(log, 100025).
+fuel(log).
+collectable(log).
+slot_in_inventory(carrot, 100026).
 edible(carrot).
 collectable(carrot).
 cookable(carrot).
-slot_in_inventory(petals, 100029).
-fuel(petals).
-collectable(petals).
-edible(petals).
-slot_in_inventory(cutgrass, 100030).
+slot_in_inventory(carrot_cooked, 100027).
+edible(carrot_cooked).
+collectable(carrot_cooked).
+slot_in_inventory(pinecone, 100028).
+fuel(pinecone).
+collectable(pinecone).
+slot_in_inventory(flint, 100029).
+collectable(flint).
+slot_in_inventory(meat, 100030).
+edible(meat).
+collectable(meat).
+cookable(meat).
+slot_in_inventory(monstermeat, 100031).
+edible(monstermeat).
+collectable(monstermeat).
+cookable(monstermeat).
+slot_in_inventory(cookedmeat, 100032).
+edible(cookedmeat).
+collectable(cookedmeat).
+slot_in_inventory(cutgrass, 100033).
 fuel(cutgrass).
 collectable(cutgrass).
-slot_in_inventory(berries, 100031).
-edible(berries).
-collectable(berries).
-cookable(berries).
-slot_in_inventory(cutgrass, 106564).
-item_in_inventory(seeds, 4).
-item_in_inventory(twigs, 18).
-item_in_inventory(flint, 2).
+item_in_inventory(log, 13).
 item_in_inventory(carrot, 5).
-item_in_inventory(petals, 2).
-item_in_inventory(cutgrass, 41).
-item_in_inventory(berries, 2).
+item_in_inventory(carrot_cooked, 7).
+item_in_inventory(pinecone, 11).
+item_in_inventory(flint, 4).
+item_in_inventory(meat, 4).
+item_in_inventory(monstermeat, 2).
+item_in_inventory(cookedmeat, 15).
+item_in_inventory(cutgrass, 1).
+equipment(axe).
+equipment_guid(axe, 100034).
+quantity(100034, 1).
+equippable(axe).
+collectable(axe).
 sanity(high).
-hunger(half).
-health(low).
-time(night, early).
+hunger(high).
+health(high).
+time(day, end).
 
 
 good_pick(planted_carrot).
