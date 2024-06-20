@@ -2,7 +2,7 @@ local DISTANCE = 20
 
 -- Enable Debug Mode (Allow Cltr + R to return to main menu when crashed)
 GLOBAL.CHEATS_ENABLED = true
-GLOBAL.require( 'debugkeys' )
+GLOBAL.require('debugkeys')
 
 -- A Don't Starve mod that reads the current state of the game and outputs it to a file. This is a mod for the sCASP project.
 local require = GLOBAL.require
@@ -22,21 +22,21 @@ local Text = require "widgets/text"
 
 require "constants"
 
-print("sCASP reader modmain.lua loaded")
+-- print("sCASP reader modmain.lua loaded")
 
 -- SERVER FUNCTIONS --
 
 local currentAction = nil
 
 function SendData(data)
-    -- print("Sending data to server")
+    -- -- print("Sending data to server")
     tcp:send(data)
 end
 
 function ReceiveData()
-    -- print("Receiving data from server")
+    -- -- print("Receiving data from server")
     local s, status, partial = tcp:receive()
-    print("Server:", s or partial)
+    -- print("Server:", s or partial)
     return s or partial
 end
 
@@ -91,7 +91,7 @@ end
 
 function Build(item)
     if not CanBuild(item) then
-        print("Cannot craft item: ", item)
+        -- print("Cannot craft item: ", item)
 
         -- get each ingredient in the recipe
         local player = GLOBAL.GetPlayer()
@@ -105,7 +105,7 @@ function Build(item)
                 local amount = v.amount
                 local count = inventory:Count(ingredient, true)
                 if count < amount then
-                    print("Missing ingredient: ", ingredient, " amount: ", amount - count)
+                    -- print("Missing ingredient: ", ingredient, " amount: ", amount - count)
                     -- find entity with the ingredient
 
                     if ingredient == "twigs" then
@@ -128,7 +128,7 @@ function Build(item)
                         end
                     end
                     -- else
-                    --     print("Ingredient: ", ingredient, " amount: ", amount)
+                    --     -- print("Ingredient: ", ingredient, " amount: ", amount)
                     --     Wander()
                     -- end
                 end
@@ -203,7 +203,7 @@ function Wander()
 
     if player.components.locomotor:HasDestination() then
         isBusy = true
-        print("Player is busy")
+        -- print("Player is busy")
         return
     end
 
@@ -212,7 +212,7 @@ function Wander()
 
     WalkInAngle(angle, 10)
 
-    print("WANDERING")
+    -- print("WANDERING")
 end
 
 local function Entity(inst, v)
@@ -226,7 +226,7 @@ local function Entity(inst, v)
     d.Cooker = v.components.cooker and true
     d.Cookable = v.components.cookable and true
     d.Edible = inst.components.eater:CanEat(v)
-    d.Equippable = v.components.equippable  and true
+    d.Equippable = v.components.equippable and true
     d.Fuel = v.components.fuel and true
     d.Fueled = v.components.fueled and not v.components.fueled:IsEmpty()
     d.Grower = v.components.grower and true
@@ -264,7 +264,7 @@ function GetInventoryItems()
     end
     return items
 end
-    
+
 function GetEquippedItems()
     local player = GLOBAL.GetPlayer()
     local inventory = player.components.inventory
@@ -277,10 +277,10 @@ function GetEquippedItems()
         end
     end
     return items
-end 
+end
 
 function GetNearbyEntities(distance)
-    print("Getting nearby entities")
+    -- print("Getting nearby entities")
     local player = GLOBAL.GetPlayer()
     local x, y, z = player.Transform:GetWorldPosition()
 
@@ -302,7 +302,7 @@ function GetParsedEntities(distance)
             table.insert(parsed_ents, entity)
         end
     end
-    print("Parsed entities: ", parsed_ents)
+    -- print("Parsed entities: ", parsed_ents)
     return parsed_ents
 end
 
@@ -320,8 +320,8 @@ function PickEntity(guid)
         end
 
         if entity.components.pickable and entity.components.pickable:CanBePicked() then
-            print("Picking entity: ", entity.prefab, " can be picked: ", entity.components.pickable:CanBePicked(),
-                " components: ", components_string)
+            -- print("Picking entity: ", entity.prefab, " can be picked: ", entity.components.pickable:CanBePicked(),
+                -- " components: ", components_string)
             player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, entity, GLOBAL.ACTIONS.PICK, nil, nil,
                 nil, 0, nil, 2), true)
             return true
@@ -345,8 +345,8 @@ function PickEntityByName(entity_name)
         end
 
         if entity.components.pickable and entity.components.pickable:CanBePicked() then
-            print("Picking entity: ", entity_name, " can be picked: ", entity.components.pickable:CanBePicked(),
-                " components: ", components_string)
+            -- print("Picking entity: ", entity_name, " can be picked: ", entity.components.pickable:CanBePicked(),
+                -- " components: ", components_string)
             player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, entity, GLOBAL.ACTIONS.PICK, nil, nil,
                 nil, 0, nil, 2), true)
             return true
@@ -369,8 +369,8 @@ function PickUpEntity(guid)
         end
 
         if entity.components.pickable and entity.components.pickable:CanBePicked() then
-            print("Picking entity: ", entity.prefab, " can be picked: ", entity.components.pickable:CanBePicked(),
-                " components: ", components_string)
+            -- print("Picking entity: ", entity.prefab, " can be picked: ", entity.components.pickable:CanBePicked(),
+                -- " components: ", components_string)
             player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, entity, GLOBAL.ACTIONS.PICK, nil, nil,
                 nil, 0, nil, 2), true)
             return true
@@ -384,14 +384,14 @@ function PickUpEntityByName(entity_name) -- pick up entity from the ground
     local entity = GetEntityByName(entity_name)
     if entity then
 
-        print("Picking up entity: ", entity_name)
+        -- print("Picking up entity: ", entity_name)
 
         -- print all components of the entity
         local components_string = ""
         for k, v in pairs(entity.components) do
             components_string = components_string .. k .. " "
         end
-        print("Components: ", components_string)
+        -- print("Components: ", components_string)
 
         -- BufferedAction walk to the entity and pick it up
         local player = GLOBAL.GetPlayer()
@@ -445,7 +445,7 @@ function Cook()
     for k, v in pairs(inventory.itemslots) do
         if v.components.cookable then
             -- buffered action
-            print("Cooking item: ", item, k)
+            -- print("Cooking item: ", item, k)
 
             local entities = GetNearbyEntities(DISTANCE)
             local entity = nil
@@ -483,7 +483,7 @@ function CookByName(item)
     for k, v in pairs(inventory.itemslots) do
         if v.prefab == item then
             -- buffered action
-            print("Cooking item: ", item, k)
+            -- print("Cooking item: ", item, k)
 
             local entities = GetNearbyEntities(DISTANCE)
             local entity = nil
@@ -543,7 +543,7 @@ function GetEntityByName(name)
     end
 
     if ent then
-        print("Found entity: ", name, " at distance: ", dist)
+        -- print("Found entity: ", name, " at distance: ", dist)
         return ent
     end
     return nil
@@ -556,7 +556,7 @@ function GetDistanceFrom(guid)
         local x, y, z = player.Transform:GetWorldPosition()
         local ex, ey, ez = entity.Transform:GetWorldPosition()
         local distance = math.sqrt((x - ex) ^ 2 + (y - ey) ^ 2 + (z - ez) ^ 2)
-        print("Distance from ", guid, ": ", distance)
+        -- print("Distance from ", guid, ": ", distance)
         return distance
     end
     return nil
@@ -570,7 +570,7 @@ function GetDistanceFromByName(entity_name)
         local x, y, z = player.Transform:GetWorldPosition()
         local ex, ey, ez = entity.Transform:GetWorldPosition()
         local distance = math.sqrt((x - ex) ^ 2 + (y - ey) ^ 2 + (z - ez) ^ 2)
-        print("Distance from ", entity_name, ": ", distance)
+        -- print("Distance from ", entity_name, ": ", distance)
         return distance
     end
     return nil
@@ -864,14 +864,14 @@ function PreparePlayerCharacter(player)
     -- The player entity isn't quite ready to equip items yet, so wait one frame
     player:DoTaskInTime(0, function()
 
-        print("Attempting connection to host '" .. host .. "' and port " .. port .. "...")
+        -- print("Attempting connection to host '" .. host .. "' and port " .. port .. "...")
         tcp:connect(host, port);
         tcp:settimeout(0.1)
 
         -- Grab a reference to the home campfire
         local x, y, z = player.Transform:GetWorldPosition()
 
-        print("Player position STARTREADER: ", x, y, z)
+        -- print("Player position STARTREADER: ", x, y, z)
 
     end)
 
@@ -892,7 +892,7 @@ function PreparePlayerCharacter(player)
         local playerfacing = player.Transform:GetRotation()
         local x, y, z = player.Transform:GetWorldPosition()
 
-        -- print("Health: ", player.components.health:GetDebugString())
+        -- -- print("Health: ", player.components.health:GetDebugString())
 
         -- GetDistanceFrom("researchlab") -- You need to be closer than 4 units to use it
         -- PlayerSleep()
@@ -901,11 +901,11 @@ function PreparePlayerCharacter(player)
         -- DropStack("cutgrass")
         -- Build("axe")
 
-        -- print(player.components.health:GetDebugString())
-        -- print(player.components.hunger:GetDebugString())
-        -- print(player.components.sanity:GetDebugString())
+        -- -- print(player.components.health:GetDebugString())
+        -- -- print(player.components.hunger:GetDebugString())
+        -- -- print(player.components.sanity:GetDebugString())
 
-        print("Player position: ", x, y, z)
+        -- print("Player position: ", x, y, z)
         local tbl = {
             health = player.components.health:GetDebugString(),
             hunger = player.components.hunger:GetDebugString(),
@@ -931,14 +931,14 @@ function PreparePlayerCharacter(player)
             indent = true
         })
 
-        -- print(str)
+        -- -- print(str)
 
         SendData(str)
         isBusy = true
         -- local data = ReceiveData()
 
         -- if currentAction then
-        --     print("Current action: ", currentAction)
+        --     -- print("Current action: ", currentAction)
         --     return
         -- end
 
@@ -948,44 +948,46 @@ function PreparePlayerCharacter(player)
         --         for k, v in pairs(tbl) do
         --             if k == "action" then
 
-        --                 print("Action: ", v)
+        --                 -- print("Action: ", v)
         --                 -- loadstring("return " .. v)()
 
-        --                 -- if v == "equip_torch_night_hostile" then
-        --                 --     Equip("torch")
-        --                 -- elseif v == "run_away_from_enemy" then
-        --                 --     RunAway("spider") -- no params
-        --                 -- elseif v == "eat_maybe_food" then
-        --                 --     EatFood("carrot") -- no params
-        --                 -- elseif v == "eat_edible_food" then
-        --                 --     EatFood("carrot") -- no params
-        --                 -- elseif v == "pick_flower" then
-        --                 --     PickEntity("flower")
-        --                 -- elseif v == "wander_flower" then
-        --                 --     Wander()
-        --                 -- elseif v == "run_to_campfire" then
-        --                 --     WalkToEntity("campfire")
-        --                 -- elseif v == "fuel_campfire" then
-        --                 --     AddFuel("log") -- no params
-        --                 -- elseif v == "build_campfire" then
-        --                 --     Build("campfire")
-        --                 -- elseif v == "equip_torch_night" then
-        --                 --     Equip("torch")
-        --                 -- elseif v == "build_torch_night" then
-        --                 --     Build("torch")
-        --                 -- elseif v == "cook_food" then
-        --                 --     Cook("meat") -- no params
-        --                 -- elseif v == "pick_anything" then
-        --                 --     PickEntity("flower") -- no params
-        --                 -- elseif v == "build_axe" then
-        --                 --     Build("axe")
-        --                 -- elseif v == "build_torch" then
-        --                 --     Build("torch")
-        --                 -- elseif v == "equip_axe" then
-        --                 --     Equip("axe")
-        --                 -- elseif v == "chop_tree" then
-        --                 --     CutDownTree()
-        --                 -- end
+        --                 -- loadstring("return " .. v)()
+
+        -- if v == "equip_torch_night_hostile" then
+        --     Equip("torch")
+        -- elseif v == "run_away_from_enemy" then
+        --     RunAway("spider") -- no params
+        -- elseif v == "eat_maybe_food" then
+        --     EatFood("carrot") -- no params
+        -- elseif v == "eat_edible_food" then
+        --     EatFood("carrot") -- no params
+        -- elseif v == "pick_flower" then
+        --     PickEntity("flower")
+        -- elseif v == "wander_flower" then
+        --     Wander()
+        -- elseif v == "run_to_campfire" then
+        --     WalkToEntity("campfire")
+        -- elseif v == "fuel_campfire" then
+        --     AddFuel("log") -- no params
+        -- elseif v == "build_campfire" then
+        --     Build("campfire")
+        -- elseif v == "equip_torch_night" then
+        --     Equip("torch")
+        -- elseif v == "build_torch_night" then
+        --     Build("torch")
+        -- elseif v == "cook_food" then
+        --     Cook("meat") -- no params
+        -- elseif v == "pick_anything" then
+        --     PickEntity("flower") -- no params
+        -- elseif v == "build_axe" then
+        --     Build("axe")
+        -- elseif v == "build_torch" then
+        --     Build("torch")
+        -- elseif v == "equip_axe" then
+        --     Equip("axe")
+        -- elseif v == "chop_tree" then
+        --     CutDownTree()
+        -- end
         --             end
         --         end
         --     end
@@ -1002,55 +1004,26 @@ function PreparePlayerCharacter(player)
         local data = ReceiveData()
 
         if currentAction then
-            print("Current action: ", currentAction)
+            -- print("Current action: ", currentAction)
             return
         end
 
         if data then
             local tbl = dkjson.decode(data)
+
+            print("Received data: ", tbl)
+
             if tbl then
                 for k, v in pairs(tbl) do
                     if k == "action" then
 
-
                         print("Action: ", v)
-                        -- loadstring("return " .. v)()
 
-                        if v == "equip_torch_night_hostile" then
-                            Equip("torch")
-                        elseif v == "run_away_from_enemy" then
-                            RunAway("spider") -- no params
-                        elseif v == "eat_maybe_food" then
-                            EatFood("carrot") -- no params
-                        elseif v == "eat_edible_food" then
-                            EatFood("carrot") -- no params
-                        elseif v == "pick_flower" then
-                            PickEntity("flower")
-                        elseif v == "wander_flower" then
-                            Wander()
-                        elseif v == "run_to_campfire" then
-                            WalkToEntity("campfire")
-                        elseif v == "fuel_campfire" then
-                            AddFuel("log") -- no params
-                        elseif v == "build_campfire" then
-                            Build("campfire")
-                        elseif v == "equip_torch_night" then
-                            Equip("torch")
-                        elseif v == "build_torch_night" then
-                            Build("torch")
-                        elseif v == "cook_food" then
-                            Cook("meat") -- no params
-                        elseif v == "pick_anything" then
-                            PickEntity("flower") -- no params
-                        elseif v == "build_axe" then
-                            Build("axe")
-                        elseif v == "build_torch" then
-                            Build("torch")
-                        elseif v == "equip_axe" then
-                            Equip("axe")
-                        elseif v == "chop_tree" then
-                            CutDownTree()
-                        end
+                        -- v is a string with the function and parameters ex: "EquipByName('axe')"/
+                        loadstring("return " .. v)()
+
+                        
+
                     end
                 end
             end

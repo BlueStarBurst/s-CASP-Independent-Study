@@ -1,4 +1,3 @@
-
 good_pick(planted_carrot).
 good_pick(carrot).
 good_pick(axe).
