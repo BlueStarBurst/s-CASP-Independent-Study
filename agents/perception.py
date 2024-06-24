@@ -119,6 +119,7 @@ def convert_json_to_predicate(json_string_data: str):
 
 
 def get_action(json_string_data: str):
+    
     predicate = convert_json_to_predicate(json_string_data)
     
     #Save the predicates to a file
@@ -135,7 +136,7 @@ def get_action(json_string_data: str):
             f.write("?- action(DESC, FUNC, ARGS).")
             f.close()
         # run the combined.pl file and get the output using os.system
-        output = run("scasp combined.pl", shell=True, capture_output=True)
+        output = run(["scasp", "combined.pl", '-n1'], capture_output=True)
         # print("Action taken", output.stdout.decode("utf-8"))
         print(output)
         desc = ""
