@@ -35,9 +35,6 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 with open("data.json", "w") as f:
                     f.write(data)
                                     
-                if not data:
-                    break
-                
                 # send json data of action: "chop" to the client
                 desc, func, args = get_action(data)
                 
