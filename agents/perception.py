@@ -5,7 +5,7 @@ from subprocess import run
 
 
 history = "" #!TODO: Implement memmory for the agent of maybe previous action taken
-GUID_SPECIFIC_TAG = ["Hostile", "Fueled", "Harvestable"]
+GUID_SPECIFIC_TAG = ["Hostile", "Fueled", "Harvestable", "Pickable"]
 
 def classify_fraction(fraction, classification=["low", "half", "high"]):
     num_categories = len(classification)
