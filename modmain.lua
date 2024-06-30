@@ -372,8 +372,10 @@ function PickEntityByName(entity_name)
 end
 
 function functions.pick_up_entity(guid)
+    print("FINDING ENTITY GUID: ", guid)
     local entity = GetEntity(guid)
     if entity then
+        print("Entity: ", entity.prefab, " can be picked")
         -- BufferedAction
         local player = GLOBAL.GetPlayer()
         -- player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, entity, GLOBAL.ACTIONS.PICK, nil, nil, nil, 0, nil, 2), true)
@@ -1047,6 +1049,10 @@ function PreparePlayerCharacter(player)
 
                 local v = tbl["func"]
                 local arg = tbl["args"]
+
+                -- remove spaces from the function name
+                v = string.gsub(v, "%s+", "")
+                
 
                 print("Action: " .. v .. "Args: " .. arg)
 
