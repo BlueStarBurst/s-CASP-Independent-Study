@@ -30,13 +30,14 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 data = conn.recv(1024*10000)
                 data = data.decode("utf-8") # decode the data from json
                 
-                print("Received data:", data)
-                
+                print(data)
                 with open("data.json", "w") as f:
                     f.write(data)
-                                    
+                
+                
                 # send json data of action: "chop" to the client
                 desc, func, args = get_action(data)
+                print(desc, func, args)
                 
                 data = json.dumps({"desc": desc, "func": func, "args": args})
                 # encode to bytes
