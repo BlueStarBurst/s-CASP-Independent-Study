@@ -5,7 +5,6 @@ from subprocess import run
 
 
 last_desc, last_func, last_args = "none", "none", "none"
-GUID_SPECIFIC_TAG = ["Hostile", "Fueled", "Harvestable", "Pickable"]
 
 EQIVALENT_ENTITY_DICT = {
     "berrybush": "berries",
@@ -40,12 +39,8 @@ def convert_json_to_predicate(json_string_data: str):
                 continue
             elif k == "Quantity":
                 predicates.append(f"quantity({entity['GUID']}, {v})")
-            elif k in GUID_SPECIFIC_TAG:
-                predicates.append(f"{str.lower(k)}({entity['GUID']})") 
             elif v == True:
-                predicate_str = f"{str.lower(k)}({entity_name})"
-                if predicate_str not in predicates:
-                    predicates.append(predicate_str)
+                predicates.append(f"{str.lower(k)}({entity['GUID']})") 
     
     
     # Load the inventory data to predicate
