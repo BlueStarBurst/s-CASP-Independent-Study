@@ -4,8 +4,15 @@ import os
 from subprocess import run
 
 
-history = "" #!TODO: Implement memmory for the agent of maybe previous action taken
+last_desc, last_func, last_args = "none", "none", "none"
 GUID_SPECIFIC_TAG = ["Hostile", "Fueled", "Harvestable", "Pickable"]
+
+EQIVALENT_ENTITY_DICT = {
+    "berrybush": "berries",
+    "sapling": "twigs",
+    "grass": "cutgrass",
+    "carrot_planted": "carrot",
+}
 
 def classify_fraction(fraction, classification=["low", "half", "high"]):
     num_categories = len(classification)
@@ -24,7 +31,10 @@ def convert_json_to_predicate(json_string_data: str):
     json_data = json.loads(json_string_data)
     # Load the entitiesOnScreen data to predicate
     for entity in json_data["entitiesOnScreen"]:
-        predicates.append(f"item_on_screen({entity['Prefab']}, {entity['GUID']})")
+        entity_name = entity["Prefab"]
+        entity_name = EQIVALENT_ENTITY_DICT.get(entity_name, entity_name)
+                
+        predicates.append(f"item_on_screen({entity_name}, {entity['GUID']})")
         for k,v in entity.items():
             if k == "Prefab" or k == "GUID":
                 continue
@@ -33,7 +43,7 @@ def convert_json_to_predicate(json_string_data: str):
             elif k in GUID_SPECIFIC_TAG:
                 predicates.append(f"{str.lower(k)}({entity['GUID']})") 
             elif v == True:
-                predicate_str = f"{str.lower(k)}({entity['Prefab']})"
+                predicate_str = f"{str.lower(k)}({entity_name})"
                 if predicate_str not in predicates:
                     predicates.append(predicate_str)
     
@@ -87,21 +97,6 @@ def convert_json_to_predicate(json_string_data: str):
     #Health
     predicates.append(f"health({get_status(json_data['health'])})")
     
-    
-    # timeOfDay = json_data["time"]
-    # currentHour = timeOfDay["currentHour"]
-    # timePeriods = timeOfDay["timePeriods"]
-    
-    # currentPhase = "day"
-    # if float(currentHour) >= float(timePeriods["day"]) + float(timePeriods["dusk"]):
-    #     currentPhase = "night"
-    #     percentagePhase = (float(currentHour) - float(timePeriods["day"]) - float(timePeriods["dusk"])) / (float(timePeriods["night"]))
-    # elif float(currentHour) >= float(timePeriods["day"]):
-    #     currentPhase = "dusk"
-    #     percentagePhase = (float(currentHour) - float(timePeriods["day"])) / (float(timePeriods["dusk"]))        
-    # else:
-    #     percentagePhase = (float(currentHour) / float(timePeriods["day"]))
-    
     #Time
     currentPhase = json_data["time"]["currentPhase"]
     percentagePhase = json_data["time"]["percentagePhasePassed"]
@@ -117,7 +112,6 @@ def convert_json_to_predicate(json_string_data: str):
     return predicates_str
 
 
-
 def get_action(json_string_data: str):
     
     predicate = convert_json_to_predicate(json_string_data)
@@ -125,20 +119,33 @@ def get_action(json_string_data: str):
     #Save the predicates to a file
     with open("predicates.pl", "w") as f:
         f.write(predicate)
-        
+        f.close()
+    
     # read all lines the predicates from actions.pl
     with open("agents/v0_HelloWorld_Wilson/action.pl", "r") as f:
         actions = f.read()
-        # combine the predicates and actions
+        f.close()
+    # combine the predicates and actions
+    with open("combined.pl", "w") as f:
+        f.write(predicate + "\n" + actions)
+        f.write("\n")
+        f.write(f"?- action({last_desc}, {last_func}, {last_args}).")
+        f.close()
+    # run the combined.pl file and get the output using os.system
+    output = run(["scasp", "combined.pl", '-n1'], capture_output=True)    
+    #Check if there is "no models"
+    print("no models" in output.stdout.decode("utf-8"))
+    if "no models" in output.stdout.decode("utf-8"):
+        
         with open("combined.pl", "w") as f:
+            #Remove the last line
             f.write(predicate + "\n" + actions)
             f.write("\n")
-            f.write("?- action(DESC, FUNC, ARGS).")
+            f.write(f"?- action(DESC, FUNC, ARGS).")
             f.close()
-        # run the combined.pl file and get the output using os.system
+        
         output = run(["scasp", "combined.pl", '-n1'], capture_output=True)
-        # print("Action taken", output.stdout.decode("utf-8"))
-        print(output)
+        
         desc = ""
         func = ""
         args = ""
@@ -157,5 +164,8 @@ def get_action(json_string_data: str):
         print("FUNC:", func)
         print("ARGS:", args)
         return desc, func, args
+    else:
+        return last_desc, last_func, last_args
+        
         
         
