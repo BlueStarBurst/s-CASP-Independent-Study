@@ -8,7 +8,7 @@ good_item(cutgrass).
 good_item(berries).
 good_item(sapling).
 
-% collectable(GUID) :- pickable(GUID).
+collectable(GUID) :- pickable(GUID).
 good_pick(GUID) :- collectable(GUID), item_on_screen(X, GUID), good_item(X), -item_in_inventory(X, N).
 good_pick(GUID) :- collectable(GUID), item_on_screen(X, GUID), good_item(X), item_in_inventory(X, N), N.<.8.
 
@@ -39,10 +39,7 @@ action(build_torch, build, torch) :- torch_ingredients(X), not equipment(torch),
 action(equip_axe, equip, axe) :- not equipment(axe), item_in_inventory(axe, N), -only_time(night).
 action(pick_log, pick_entity, GUID) :- item_on_screen(log, GUID).
 action(chop_tree, chop_tree, GUID) :- item_on_screen(X, GUID), choppable(X), equipment(axe).
-action(pick_anything, pick_entity, GUID) :- item_on_screen(X, GUID), pickable(GUID).
-action(pick_up_entity, pick_up_entity, GUID) :- item_on_screen(X, GUID), collectable(GUID).
-% action(wander, wander, nil) :- not only_time(night).
+action(pick_anything, pick_entity, GUID) :- item_on_screen(X, GUID), good_pick(GUID).
+action(wander, wander, nil) :- not only_time(night).
 
-?- action(DESC, FUNC, ARGS).
-
-% ?- item_on_screen(X, GUID), collectable(GUID).
+?- good_pick(GUID) .

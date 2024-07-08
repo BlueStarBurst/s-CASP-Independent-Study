@@ -137,13 +137,17 @@ def get_action(json_string_data: str):
             f.write(predicate + "\n" + actions)
             f.write("\n")
             f.write(f"?- action(DESC, FUNC, ARGS).")
+            # f.write(f"?- good_pick(GUID).")
             f.close()
         
-        output = run(["scasp", "combined.pl", '-n1'], capture_output=True)
+        output = run(["scasp", "combined.pl", '-n100'], capture_output=True)
         
         desc = ""
         func = ""
         args = ""
+        
+        print("output:", output.stdout.decode("utf-8"))
+        print("error:", output.stderr.decode("utf-8"))
         
         # get line with DESC =
         output = output.stdout.decode("utf-8").split("\n")

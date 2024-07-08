@@ -30,7 +30,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 data = conn.recv(1024*10000)
                 data = data.decode("utf-8") # decode the data from json
                 
-                print(data)
+                # print(data)
                 with open("data.json", "w") as f:
                     f.write(data)
                 
