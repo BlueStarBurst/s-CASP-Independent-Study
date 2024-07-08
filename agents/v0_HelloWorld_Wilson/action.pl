@@ -9,8 +9,9 @@ good_item(berries).
 good_item(sapling).
 
 collectable(GUID) :- pickable(GUID).
-good_pick(GUID) :- collectable(GUID), item_on_screen(X, GUID), good_item(X), -item_in_inventory(X, N).
-good_pick(GUID) :- collectable(GUID), item_on_screen(X, GUID), good_item(X), item_in_inventory(X, N), N.<.8.
+good_pick(GUID) :- collectable(GUID), item_on_screen(X, GUID), good_item(X).
+% good_pick(GUID) :- collectable(GUID), item_on_screen(X, GUID), good_item(X), -item_in_inventory(X, N).
+% good_pick(GUID) :- collectable(GUID), item_on_screen(X, GUID), good_item(X), item_in_inventory(X, N), N.<.8.
 
 torch_ingredients:- item_in_inventory(cutgrass, X), X.>=.2, item_in_inventory(twigs, Y), Y.>=.2.
 
@@ -40,6 +41,5 @@ action(equip_axe, equip, axe) :- not equipment(axe), item_in_inventory(axe, N), 
 action(pick_log, pick_entity, GUID) :- item_on_screen(log, GUID).
 action(chop_tree, chop_tree, GUID) :- item_on_screen(X, GUID), choppable(X), equipment(axe).
 action(pick_anything, pick_entity, GUID) :- item_on_screen(X, GUID), good_pick(GUID).
-action(wander, wander, nil) :- not only_time(night).
+action(no_repeat_wander, wander, nil) :- not only_time(night).
 
-?- good_pick(GUID) .
