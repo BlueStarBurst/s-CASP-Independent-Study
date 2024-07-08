@@ -67,8 +67,6 @@ def convert_json_to_predicate(json_string_data: str):
                 continue
             elif k == "Quantity":
                 predicates.append(f"quantity({entity['GUID']}, {v})")
-            elif k in GUID_SPECIFIC_TAG:
-                predicates.append(f"{str.lower(k)}({entity['GUID']})") 
             elif v == True:
                 predicate_str = f"{str.lower(k)}({entity['Prefab']})"
                 if predicate_str not in predicates:
@@ -108,6 +106,7 @@ def convert_json_to_predicate(json_string_data: str):
 
 
 def get_action(json_string_data: str):
+    global last_desc, last_func, last_args
     
     predicate = convert_json_to_predicate(json_string_data)
     
@@ -154,10 +153,16 @@ def get_action(json_string_data: str):
                 func = line.split("FUNC = ")[1]
             elif "ARGS =" in line:
                 args = line.split("ARGS = ")[1]
-                
-        print("DESC:", desc)
-        print("FUNC:", func)
-        print("ARGS:", args)
+        
+        if ("no_repeat" not in desc):
+            last_desc = desc
+            last_func = func
+            last_args = args
+        else:
+            last_desc = "none"
+            last_func = "none"
+            last_args = "none"
+        
         return desc, func, args
     else:
         return last_desc, last_func, last_args
