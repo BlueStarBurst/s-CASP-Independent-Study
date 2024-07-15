@@ -110,25 +110,25 @@ function functions.build(item)
                     print("Missing ingredient: ", ingredient, " amount: ", amount - count)
                     -- find entity with the ingredient
 
-                    if ingredient == "twigs" then
-                        if PickEntityByName("sapling") then
-                            return true
-                        else
-                            wander()
-                        end
-                    elseif ingredient == "cutgrass" then
-                        if PickEntityByName("grass") then
-                            return true
-                        else
-                            wander()
-                        end
-                    else
-                        if PickUpEntityByName(ingredient) then
-                            return true
-                        else
-                            wander()
-                        end
-                    end
+                    -- if ingredient == "twigs" then
+                    --     if PickEntityByName("sapling") then
+                    --         return true
+                    --     else
+                    --         wander()
+                    --     end
+                    -- elseif ingredient == "cutgrass" then
+                    --     if PickEntityByName("grass") then
+                    --         return true
+                    --     else
+                    --         wander()
+                    --     end
+                    -- else
+                    --     if PickUpEntityByName(ingredient) then
+                    --         return true
+                    --     else
+                    --         wander()
+                    --     end
+                    -- end
                     -- else
                     --     print("Ingredient: ", ingredient, " amount: ", amount)
                     --     wander()
@@ -785,8 +785,8 @@ function functions.cut_down_tree()
     if closest then
         player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, closest, GLOBAL.ACTIONS.CHOP, nil, nil,
             nil, 0, nil, 2), true)
-    else
-        wander()
+    -- else
+    --     wander()
     end
 end
 
@@ -1067,52 +1067,6 @@ function PreparePlayerCharacter(player)
                     print("Running function: ", v)
                     func(arg)
                 end
-
-                -- print list of functions in the global scope
-
-                -- if v == "equip_torch_night_hostile" then
-                --     equip("torch")
-                -- elseif v == "run_away" then
-                --     run_away(arg) -- no params
-                -- elseif v == "eat_food" then
-                --     eat_food(arg) -- no params
-                -- elseif v == "eat_edible_food" then
-                --     eat_food("carrot") -- no params
-                -- elseif v == "pick_flower" then
-                --     pick_entity("flower")
-                -- elseif v == "pick_entity" then
-                --     pick_entity(arg)
-                -- elseif v == "pickup_entity" then
-                --     pick_up_entity(arg)
-                -- elseif v == "wander_flower" then
-                --     wander()
-                -- elseif v == "run_to_campfire" then
-                --     walk_to_entity("campfire")
-                -- elseif v == "fuel_campfire" then
-                --     add_fuel("log") -- no params
-                -- elseif v == "build_campfire" then
-                --     build("campfire")
-                -- elseif v == "equip_torch_night" then
-                --     equip("torch")
-                -- elseif v == "build_torch_night" then
-                --     build("torch")
-                -- elseif v == "cook_food" then
-                --     cook("meat") -- no params
-                -- elseif v == "pick_anything" then
-                --     pick_entity("flower") -- no params
-                -- elseif v == "build_axe" then
-                --     build("axe")
-                -- elseif v == "build_torch" then
-                --     build("torch")
-                -- elseif v == "equip_axe" then
-                --     equip("axe")
-                -- elseif v == "chop_tree" then
-                --     cut_down_tree()
-                -- elseif v == "build" then
-                --     build(arg)
-                -- elseif v == "" then
-                --     wander()
-                -- end
 
             end
 
