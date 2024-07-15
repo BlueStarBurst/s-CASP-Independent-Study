@@ -108,31 +108,7 @@ function functions.build(item)
                 local count = inventory:Count(ingredient, true)
                 if count < amount then
                     print("Missing ingredient: ", ingredient, " amount: ", amount - count)
-                    -- find entity with the ingredient
-
-                    -- if ingredient == "twigs" then
-                    --     if PickEntityByName("sapling") then
-                    --         return true
-                    --     else
-                    --         wander()
-                    --     end
-                    -- elseif ingredient == "cutgrass" then
-                    --     if PickEntityByName("grass") then
-                    --         return true
-                    --     else
-                    --         wander()
-                    --     end
-                    -- else
-                    --     if PickUpEntityByName(ingredient) then
-                    --         return true
-                    --     else
-                    --         wander()
-                    --     end
-                    -- end
-                    -- else
-                    --     print("Ingredient: ", ingredient, " amount: ", amount)
-                    --     wander()
-                    -- end
+    
                 end
             end
         end
