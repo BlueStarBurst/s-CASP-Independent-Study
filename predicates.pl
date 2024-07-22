@@ -1,188 +1,206 @@
-item_on_screen(log, 107696).
-fuel(107696).
-collectable(107696).
-distance(107696, 0.31801595451783).
-quantity(107696, 1).
-item_on_screen(pinecone, 107698).
-fuel(107698).
-collectable(107698).
-distance(107698, 0.43336815949673).
-quantity(107698, 1).
-item_on_screen(log, 107695).
-fuel(107695).
-collectable(107695).
-distance(107695, 1.2084588390958).
-quantity(107695, 1).
-item_on_screen(pinecone, 107699).
-fuel(107699).
-collectable(107699).
-distance(107699, 2.2463314175827).
-quantity(107699, 1).
-item_on_screen(log, 107697).
-fuel(107697).
-collectable(107697).
-distance(107697, 2.8976893614502).
-quantity(107697, 1).
-item_on_screen(twigs, 106319).
-diggable(106319).
-workable(106319).
-distance(106319, 4.8049580079685).
-quantity(106319, 1).
-pickable(106319).
-item_on_screen(evergreen, 104766).
-workable(104766).
-choppable(104766).
-distance(104766, 6.3082448627007).
-quantity(104766, 1).
-item_on_screen(robin, 107680).
-quantity(107680, 1).
-cookable(107680).
-distance(107680, 8.0228287823254).
-item_on_screen(cutgrass, 101942).
-diggable(101942).
-workable(101942).
-distance(101942, 8.2294301411049).
-quantity(101942, 1).
-pickable(101942).
-item_on_screen(butterfly, 107487).
-distance(107487, 8.2906212643585).
-quantity(107487, 1).
-workable(107487).
+item_on_screen(twigs, 106326).
+diggable(106326).
+workable(106326).
+distance(106326, 0.45226946406238).
+quantity(106326, 1).
+item_on_screen(pinecone, 107507).
+fuel(107507).
+collectable(107507).
+distance(107507, 6.1488665026446).
+quantity(107507, 1).
+item_on_screen(pinecone, 107508).
+fuel(107508).
+collectable(107508).
+distance(107508, 6.9450046486047).
+quantity(107508, 1).
+item_on_screen(evergreen, 104742).
+diggable(104742).
+workable(104742).
+distance(104742, 7.716806152821).
+quantity(104742, 1).
+item_on_screen(cutgrass, 101951).
+diggable(101951).
+workable(101951).
+distance(101951, 8.5502978120609).
+quantity(101951, 1).
+item_on_screen(pinecone, 107557).
+fuel(107557).
+collectable(107557).
+distance(107557, 10.320774750811).
+quantity(107557, 1).
+item_on_screen(pinecone, 107648).
+fuel(107648).
+collectable(107648).
+distance(107648, 11.06181768496).
+quantity(107648, 1).
+item_on_screen(evergreen, 104784).
+diggable(104784).
+workable(104784).
+distance(104784, 11.3281408609).
+quantity(104784, 1).
+item_on_screen(evergreen, 104736).
+diggable(104736).
+workable(104736).
+distance(104736, 11.367974749077).
+quantity(104736, 1).
+item_on_screen(pinecone, 107629).
+fuel(107629).
+collectable(107629).
+distance(107629, 11.387807554757).
+quantity(107629, 1).
+item_on_screen(evergreen, 104796).
+diggable(104796).
+workable(104796).
+distance(104796, 11.408653123511).
+quantity(104796, 1).
+item_on_screen(flower, 100988).
+quantity(100988, 1).
+pickable(100988).
+distance(100988, 11.663978411688).
+item_on_screen(cutgrass, 101954).
+diggable(101954).
+workable(101954).
+distance(101954, 11.85033556066).
+quantity(101954, 1).
+item_on_screen(flower, 100991).
+quantity(100991, 1).
+pickable(100991).
+distance(100991, 11.955961837611).
+item_on_screen(cutgrass, 101950).
+diggable(101950).
+workable(101950).
+distance(101950, 12.03314701635).
+quantity(101950, 1).
+item_on_screen(twigs, 106316).
+diggable(106316).
+workable(106316).
+distance(106316, 12.174539554802).
+quantity(106316, 1).
+pickable(106316).
+item_on_screen(evergreen, 104790).
+diggable(104790).
+workable(104790).
+distance(104790, 12.225066004518).
+quantity(104790, 1).
+item_on_screen(carrot, 101236).
+quantity(101236, 1).
+pickable(101236).
+distance(101236, 12.291274363807).
+item_on_screen(evergreen, 104724).
+diggable(104724).
+workable(104724).
+distance(104724, 12.592369822324).
+quantity(104724, 1).
+item_on_screen(pinecone, 107556).
+fuel(107556).
+collectable(107556).
+distance(107556, 12.889146609332).
+quantity(107556, 1).
+item_on_screen(pinecone, 107610).
+fuel(107610).
+collectable(107610).
+distance(107610, 13.063008966736).
+quantity(107610, 1).
+item_on_screen(pinecone, 107586).
+fuel(107586).
+collectable(107586).
+distance(107586, 13.330514318672).
+quantity(107586, 1).
+item_on_screen(flower, 100992).
+quantity(100992, 1).
+pickable(100992).
+distance(100992, 13.691077090026).
+item_on_screen(cutgrass, 101952).
+diggable(101952).
+workable(101952).
+distance(101952, 14.069871733306).
+quantity(101952, 1).
+pickable(101952).
+item_on_screen(cutgrass, 101953).
+diggable(101953).
+workable(101953).
+distance(101953, 14.072962843463).
+quantity(101953, 1).
+pickable(101953).
+item_on_screen(cutgrass, 101945).
+diggable(101945).
+workable(101945).
+distance(101945, 15.272088835485).
+quantity(101945, 1).
+item_on_screen(cutgrass, 101949).
+diggable(101949).
+workable(101949).
+distance(101949, 15.454528506696).
+quantity(101949, 1).
+item_on_screen(seeds, 107915).
+edible(107915).
+quantity(107915, 1).
+collectable(107915).
+cookable(107915).
+distance(107915, 16.208369153399).
+item_on_screen(flower, 100993).
+quantity(100993, 1).
+pickable(100993).
+distance(100993, 16.340526496761).
+item_on_screen(twigs, 106315).
+diggable(106315).
+workable(106315).
+distance(106315, 16.564517938327).
+quantity(106315, 1).
+pickable(106315).
+item_on_screen(seeds, 107700).
+edible(107700).
+quantity(107700, 1).
+collectable(107700).
+cookable(107700).
+distance(107700, 16.636206105876).
 item_on_screen(pinecone, 107672).
 fuel(107672).
 collectable(107672).
-distance(107672, 9.5102393881119).
+distance(107672, 17.137600980491).
 quantity(107672, 1).
 item_on_screen(evergreen, 104748).
 diggable(104748).
 workable(104748).
-distance(104748, 10.322416766141).
+distance(104748, 19.073440665137).
 quantity(104748, 1).
-item_on_screen(flower, 100988).
-quantity(100988, 1).
-pickable(100988).
-distance(100988, 10.36344426788).
 item_on_screen(pinecone, 107673).
 fuel(107673).
 collectable(107673).
-distance(107673, 10.88915935988).
+distance(107673, 19.918382181393).
 quantity(107673, 1).
-item_on_screen(twigs, 106320).
-diggable(106320).
-workable(106320).
-distance(106320, 11.314975512662).
-quantity(106320, 1).
-pickable(106320).
-item_on_screen(butterfly, 107642).
-distance(107642, 11.399579780757).
-quantity(107642, 1).
-workable(107642).
-item_on_screen(flower, 100991).
-quantity(100991, 1).
-pickable(100991).
-distance(100991, 11.563873171924).
-item_on_screen(evergreen, 104730).
-workable(104730).
-choppable(104730).
-distance(104730, 11.823795509066).
-quantity(104730, 1).
-item_on_screen(robin, 107689).
-quantity(107689, 1).
-cookable(107689).
-distance(107689, 11.914485317827).
-item_on_screen(cutgrass, 101945).
-diggable(101945).
-workable(101945).
-distance(101945, 12.379327198411).
-quantity(101945, 1).
-item_on_screen(red_mushroom, 101072).
-diggable(101072).
-workable(101072).
-distance(101072, 12.840521660064).
-quantity(101072, 1).
-pickable(101072).
-item_on_screen(berries, 105739).
-diggable(105739).
-workable(105739).
-distance(105739, 13.026593041874).
-quantity(105739, 1).
-pickable(105739).
-item_on_screen(flower, 100989).
-quantity(100989, 1).
-pickable(100989).
-distance(100989, 13.520490677093).
-item_on_screen(cutgrass, 101943).
-diggable(101943).
-workable(101943).
-distance(101943, 15.044877606251).
-quantity(101943, 1).
-pickable(101943).
-item_on_screen(evergreen, 104772).
-workable(104772).
-choppable(104772).
-distance(104772, 15.470754065357).
-quantity(104772, 1).
-item_on_screen(cutgrass, 101951).
-diggable(101951).
-workable(101951).
-distance(101951, 15.52315145435).
-quantity(101951, 1).
-pickable(101951).
-item_on_screen(robin, 107677).
-quantity(107677, 1).
-cookable(107677).
-distance(107677, 15.647072765905).
-item_on_screen(cutgrass, 101941).
-diggable(101941).
-workable(101941).
-distance(101941, 16.040532446205).
-quantity(101941, 1).
-pickable(101941).
-item_on_screen(cutgrass, 101944).
-diggable(101944).
-workable(101944).
-distance(101944, 16.389106667127).
-quantity(101944, 1).
-pickable(101944).
-item_on_screen(flower, 100992).
-quantity(100992, 1).
-pickable(100992).
-distance(100992, 16.648075792089).
-item_on_screen(flower, 100889).
-quantity(100889, 1).
-pickable(100889).
-distance(100889, 16.961546478998).
-item_on_screen(cutgrass, 101940).
-diggable(101940).
-workable(101940).
-distance(101940, 18.737074889654).
-quantity(101940, 1).
-pickable(101940).
-item_on_screen(twigs, 106322).
-diggable(106322).
-workable(106322).
-distance(106322, 19.289157350946).
-quantity(106322, 1).
-item_on_screen(twigs, 106317).
-diggable(106317).
-workable(106317).
-distance(106317, 19.65537081376).
-quantity(106317, 1).
-pickable(106317).
 slot_in_inventory(cutgrass, 107455).
 fuel(cutgrass).
 collectable(cutgrass).
 slot_in_inventory(log, 107506).
 fuel(log).
 collectable(log).
-item_in_inventory(cutgrass, 2).
-item_in_inventory(log, 17).
+slot_in_inventory(log, 107718).
+slot_in_inventory(flint, 100473).
+collectable(flint).
+slot_in_inventory(berries, 107797).
+edible(berries).
+collectable(berries).
+cookable(berries).
+slot_in_inventory(twigs, 107807).
+fuel(twigs).
+collectable(twigs).
+slot_in_inventory(carrot, 107905).
+edible(carrot).
+collectable(carrot).
+cookable(carrot).
+item_in_inventory(cutgrass, 13).
+item_in_inventory(log, 35).
+item_in_inventory(flint, 2).
+item_in_inventory(berries, 2).
+item_in_inventory(twigs, 9).
+item_in_inventory(carrot, 1).
 equipment(axe).
 equipment_guid(axe, 107481).
 quantity(107481, 1).
 equippable(axe).
 collectable(axe).
 sanity(high).
-hunger(high).
+hunger(half).
 health(high).
-time(day, end).
+time(night, early).
