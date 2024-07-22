@@ -30,7 +30,7 @@ def convert_json_to_predicate(json_string_data: str):
     json_data = json.loads(json_string_data)
     # Load the entitiesOnScreen data to predicate
     for entity in json_data["entitiesOnScreen"]:
-        entity_name = entity["Prefab"]
+        entity_name = entity.get("Prefab", "none")
         entity_name = EQIVALENT_ENTITY_DICT.get(entity_name, entity_name)
                 
         predicates.append(f"item_on_screen({entity_name}, {entity['GUID']})")
@@ -122,6 +122,7 @@ def get_action(json_string_data: str):
         actions = f.read()
         f.close()
     # combine the predicates and actions
+    
     with open("combined.pl", "w") as f:
         f.write(predicate + "\n" + actions)
         f.write("\n")
@@ -130,8 +131,9 @@ def get_action(json_string_data: str):
     # run the combined.pl file and get the output using os.system
     output = run(["scasp", "combined.pl", '-n1'], capture_output=True)    
     #Check if there is "no models"
-    print("no models" in output.stdout.decode("utf-8"))
-    if "no models" in output.stdout.decode("utf-8"):
+    get_next_action = ("no models" in output.stdout.decode("utf-8"))
+    
+    if get_next_action:
         
         with open("combined.pl", "w") as f:
             #Remove the last line
