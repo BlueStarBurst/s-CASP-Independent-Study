@@ -39,6 +39,8 @@ def convert_json_to_predicate(json_string_data: str):
                 continue
             elif k == "Quantity":
                 predicates.append(f"quantity({entity['GUID']}, {v})")
+            elif k == "Distance":
+                predicates.append(f"distance({entity['GUID']}, {v})")
             elif v == True:
                 predicates.append(f"{str.lower(k)}({entity['GUID']})") 
     

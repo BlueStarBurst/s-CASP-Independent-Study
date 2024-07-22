@@ -219,6 +219,8 @@ local function Entity(inst, v)
     d.Hammerable = d.Workable and v.components.workable.action == GLOBAL.ACTIONS.HAMMER
     d.Mineable = d.Workable and v.components.workable.action == GLOBAL.ACTIONS.MINE
 
+    d.Distance = GetDistanceFrom(v.GUID)
+
     -- remove all keyx with false values
     for k, v in pairs(d) do
         if not v then
