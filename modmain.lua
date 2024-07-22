@@ -108,31 +108,7 @@ function functions.build(item)
                 local count = inventory:Count(ingredient, true)
                 if count < amount then
                     print("Missing ingredient: ", ingredient, " amount: ", amount - count)
-                    -- find entity with the ingredient
-
-                    if ingredient == "twigs" then
-                        if PickEntityByName("sapling") then
-                            return true
-                        else
-                            wander()
-                        end
-                    elseif ingredient == "cutgrass" then
-                        if PickEntityByName("grass") then
-                            return true
-                        else
-                            wander()
-                        end
-                    else
-                        if PickUpEntityByName(ingredient) then
-                            return true
-                        else
-                            wander()
-                        end
-                    end
-                    -- else
-                    --     print("Ingredient: ", ingredient, " amount: ", amount)
-                    --     wander()
-                    -- end
+    
                 end
             end
         end
@@ -242,6 +218,8 @@ local function Entity(inst, v)
     d.Diggable = d.Workable and v.components.workable.action == GLOBAL.ACTIONS.DIG
     d.Hammerable = d.Workable and v.components.workable.action == GLOBAL.ACTIONS.HAMMER
     d.Mineable = d.Workable and v.components.workable.action == GLOBAL.ACTIONS.MINE
+
+    d.Distance = GetDistanceFrom(v.GUID)
 
     -- remove all keyx with false values
     for k, v in pairs(d) do
@@ -785,27 +763,23 @@ function functions.cut_down_tree()
     if closest then
         player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, closest, GLOBAL.ACTIONS.CHOP, nil, nil,
             nil, 0, nil, 2), true)
-    else
-        wander()
+    -- else
+    --     wander()
     end
 end
 
+local is_chopping = false
+
 function functions.chop_tree(guid)
+
+    if is_chopping then
+        return
+    end
 
     print("Chopping tree: ", guid)
 
     local player = GLOBAL.GetPlayer()
     local x, y, z = player.Transform:GetWorldPosition()
-
-    -- if logs or pinecones are on the ground, pick them up
-    local ents = GLOBAL.TheSim:FindEntities(x, y, z, 10)
-    for k, v in pairs(ents) do
-        if v.prefab == "log" or v.prefab == "pinecone" then
-            if PickUpEntityByName(v.prefab) == true then
-                return
-            end
-        end
-    end
 
     if not EquipByName("axe") then
         return
@@ -837,8 +811,22 @@ function functions.chop_tree(guid)
     -- chop down the tree with guid
     local entity = GetEntity(guid)
     if entity then
-        player.components.locomotor:PushAction(
-            GLOBAL.BufferedAction(player, entity, GLOBAL.ACTIONS.CHOP, nil, nil, nil, 0, nil, 2), true)
+        is_chopping = true
+
+        local buffered = GLOBAL.BufferedAction(player, entity, GLOBAL.ACTIONS.CHOP, nil, nil, nil, 0, nil, 2)
+
+        -- on success, clear the action
+        buffered:AddSuccessAction(function()
+            is_chopping = false
+        end)
+
+        buffered:AddFailAction(function()
+            is_chopping = false
+        end)
+
+        player.components.locomotor:PushAction(buffered, true)
+
+        
     end
 end
 
@@ -1067,52 +1055,6 @@ function PreparePlayerCharacter(player)
                     print("Running function: ", v)
                     func(arg)
                 end
-
-                -- print list of functions in the global scope
-
-                -- if v == "equip_torch_night_hostile" then
-                --     equip("torch")
-                -- elseif v == "run_away" then
-                --     run_away(arg) -- no params
-                -- elseif v == "eat_food" then
-                --     eat_food(arg) -- no params
-                -- elseif v == "eat_edible_food" then
-                --     eat_food("carrot") -- no params
-                -- elseif v == "pick_flower" then
-                --     pick_entity("flower")
-                -- elseif v == "pick_entity" then
-                --     pick_entity(arg)
-                -- elseif v == "pickup_entity" then
-                --     pick_up_entity(arg)
-                -- elseif v == "wander_flower" then
-                --     wander()
-                -- elseif v == "run_to_campfire" then
-                --     walk_to_entity("campfire")
-                -- elseif v == "fuel_campfire" then
-                --     add_fuel("log") -- no params
-                -- elseif v == "build_campfire" then
-                --     build("campfire")
-                -- elseif v == "equip_torch_night" then
-                --     equip("torch")
-                -- elseif v == "build_torch_night" then
-                --     build("torch")
-                -- elseif v == "cook_food" then
-                --     cook("meat") -- no params
-                -- elseif v == "pick_anything" then
-                --     pick_entity("flower") -- no params
-                -- elseif v == "build_axe" then
-                --     build("axe")
-                -- elseif v == "build_torch" then
-                --     build("torch")
-                -- elseif v == "equip_axe" then
-                --     equip("axe")
-                -- elseif v == "chop_tree" then
-                --     cut_down_tree()
-                -- elseif v == "build" then
-                --     build(arg)
-                -- elseif v == "" then
-                --     wander()
-                -- end
 
             end
 
