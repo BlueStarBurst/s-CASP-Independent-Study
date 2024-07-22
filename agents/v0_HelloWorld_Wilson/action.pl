@@ -42,6 +42,6 @@ action(pick_up_log, pick_up_entity, GUID) :- item_on_screen(log, GUID).
 action(chop_tree, chop_tree, GUID) :- choppable(GUID), equipment(axe), good_amount(log, 8).
 action(pick_up_anythin, pick_up_entity, GUID) :- item_on_screen(X, GUID), good_amount(X, 8), good_item(X), collectable(GUID).
 action(pick_anything, pick_entity, GUID) :- item_on_screen(X, GUID), good_amount(X, 8), good_item(X), pickable(GUID).
-action(no_repeat_wander, wander, nil) :- -time(night).
+action(no_repeat_wander, wander, nil) :- not time(night).
 
 
