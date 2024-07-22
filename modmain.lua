@@ -817,6 +817,7 @@ function functions.chop_tree(guid)
 
         -- on success, clear the action
         buffered:AddSuccessAction(function()
+            inventory.equipslots[slot].components.finiteuses:Use()
             is_chopping = false
         end)
 
@@ -824,6 +825,8 @@ function functions.chop_tree(guid)
             is_chopping = false
         end)
 
+        player.components.locomotor:PushAction(buffered, true)
+        player.components.locomotor:PushAction(buffered, true)
         player.components.locomotor:PushAction(buffered, true)
 
         
