@@ -207,6 +207,7 @@ local function Entity(inst, v)
     d.Equippable = v.components.equippable and true
     d.Fuel = v.components.fuel and true
     d.Fueled = v.components.fueled and not v.components.fueled:IsEmpty()
+    d.FueledPercent = v.components.fueled and v.components.fueled:GetPercent()
     d.Grower = v.components.grower and true
     d.Harvestable = v:HasTag("readyforharvest") or (v.components.stewer and v.components.stewer:IsDone())
     d.Collectable = v.components.inventoryitem and v.components.inventoryitem.canbepickedup and not v:HasTag("heavy") -- PICKUP
