@@ -122,54 +122,32 @@ def get_action(json_string_data: str):
         actions = f.read()
         f.close()
     # combine the predicates and actions
-    
+
     with open("combined.pl", "w") as f:
+        #Remove the last line
         f.write(predicate + "\n" + actions)
         f.write("\n")
-        f.write(f"?- action({last_desc}, {last_func}, {last_args}).")
+        f.write(f"?- action(DESC, FUNC, ARGS).")
         f.close()
-    # run the combined.pl file and get the output using os.system
-    output = run(["scasp", "combined.pl", '-n1'], capture_output=True)    
-    #Check if there is "no models"
-    get_next_action = ("no models" in output.stdout.decode("utf-8"))
     
-    if get_next_action:
-        
-        with open("combined.pl", "w") as f:
-            #Remove the last line
-            f.write(predicate + "\n" + actions)
-            f.write("\n")
-            f.write(f"?- action(DESC, FUNC, ARGS).")
-            f.close()
-        
-        output = run(["scasp", "combined.pl", '-n1'], capture_output=True)
-        
-        desc = ""
-        func = ""
-        args = ""
-        
-        # get line with DESC =
-        output = output.stdout.decode("utf-8").split("\n")
-        for line in output:
-            if "DESC =" in line:
-                desc = line.split("DESC = ")[1]
-            elif "FUNC =" in line:
-                func = line.split("FUNC = ")[1]
-            elif "ARGS =" in line:
-                args = line.split("ARGS = ")[1]
-        
-        if ("no_repeat" not in desc):
-            last_desc = desc
-            last_func = func
-            last_args = args
-        else:
-            last_desc = "none"
-            last_func = "none"
-            last_args = "none"
-        
-        return desc, func, args
-    else:
-        return last_desc, last_func, last_args
+    output = run(["scasp", "combined.pl", '-n1'], capture_output=True)
+    
+    desc = ""
+    func = ""
+    args = ""
+    
+    # get line with DESC =
+    output = output.stdout.decode("utf-8").split("\n")
+    for line in output:
+        if "DESC =" in line:
+            desc = line.split("DESC = ")[1]
+        elif "FUNC =" in line:
+            func = line.split("FUNC = ")[1]
+        elif "ARGS =" in line:
+            args = line.split("ARGS = ")[1]
+    
+    return desc, func, args
+
         
         
         
