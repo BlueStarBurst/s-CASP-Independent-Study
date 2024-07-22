@@ -64,7 +64,7 @@ collectable(cutgrass).
 item_in_inventory(twigs, 3).
 item_in_inventory(cutgrass, 1).
 sanity(high).
-hunger(high).
+hunger(half).
 health(high).
 time(day, mid).
 
