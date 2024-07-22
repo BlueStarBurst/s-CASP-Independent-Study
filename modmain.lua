@@ -768,22 +768,18 @@ function functions.cut_down_tree()
     end
 end
 
+local is_chopping = false
+
 function functions.chop_tree(guid)
+
+    if is_chopping then
+        return
+    end
 
     print("Chopping tree: ", guid)
 
     local player = GLOBAL.GetPlayer()
     local x, y, z = player.Transform:GetWorldPosition()
-
-    -- if logs or pinecones are on the ground, pick them up
-    local ents = GLOBAL.TheSim:FindEntities(x, y, z, 10)
-    for k, v in pairs(ents) do
-        if v.prefab == "log" or v.prefab == "pinecone" then
-            if PickUpEntityByName(v.prefab) == true then
-                return
-            end
-        end
-    end
 
     if not EquipByName("axe") then
         return
@@ -815,8 +811,22 @@ function functions.chop_tree(guid)
     -- chop down the tree with guid
     local entity = GetEntity(guid)
     if entity then
-        player.components.locomotor:PushAction(
-            GLOBAL.BufferedAction(player, entity, GLOBAL.ACTIONS.CHOP, nil, nil, nil, 0, nil, 2), true)
+        is_chopping = true
+
+        local buffered = GLOBAL.BufferedAction(player, entity, GLOBAL.ACTIONS.CHOP, nil, nil, nil, 0, nil, 2)
+
+        -- on success, clear the action
+        buffered:AddSuccessAction(function()
+            is_chopping = false
+        end)
+
+        buffered:AddFailAction(function()
+            is_chopping = false
+        end)
+
+        player.components.locomotor:PushAction(buffered, true)
+
+        
     end
 end
 
