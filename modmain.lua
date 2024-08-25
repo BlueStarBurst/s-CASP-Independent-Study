@@ -413,7 +413,7 @@ function PickEntityByName(entity_name)
     return false
 end
 
-function functions.pick_up_entity(guid)
+function functions.collect_entity(guid)
     print("FINDING ENTITY GUID: ", guid)
     local entity = GetEntity(guid)
     if entity then
