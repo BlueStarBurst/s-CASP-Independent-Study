@@ -27,7 +27,10 @@ def classify_fraction(fraction, classification=["low", "half", "high"]):
 
 def convert_json_to_predicate(json_string_data: str):
     predicates = []
-    json_data = json.loads(json_string_data)
+    try:
+        json_data = json.loads(json_string_data)
+    except:
+        return
     # Load the entitiesOnScreen data to predicate
     for entity in json_data["entitiesOnScreen"]:
         entity_name = entity.get("Prefab", "none")
@@ -57,6 +60,7 @@ def convert_json_to_predicate(json_string_data: str):
                 predicate_str = f"{str.lower(k)}({entity['Prefab']})"
                 if predicate_str not in predicates:
                     predicates.append(predicate_str)
+    
     for k,v in inventory.items():
         predicates.append(f"item_in_inventory({k}, {v})")
         
@@ -130,23 +134,42 @@ def get_action(json_string_data: str):
         f.write(f"?- action(DESC, FUNC, ARGS).")
         f.close()
     
-    output = run(["scasp", "combined.pl", '-n1'], capture_output=True)
+    output = run(["scasp", "combined.pl", '-n0'], capture_output=True)
     
+    best_desc, best_func, best_args = "none", "none", "none"
+    action_queue = []
+
+    output = output.stdout.decode("utf-8").split("\n")
     desc = ""
     func = ""
     args = ""
-    
-    # get line with DESC =
-    output = output.stdout.decode("utf-8").split("\n")
     for line in output:
         if "DESC =" in line:
-            desc = line.split("DESC = ")[1]
+            desc = str(line.split("DESC = ")[1]).strip()
         elif "FUNC =" in line:
-            func = line.split("FUNC = ")[1]
+            func = str(line.split("FUNC = ")[1]).strip()
         elif "ARGS =" in line:
-            args = line.split("ARGS = ")[1]
+            args = str(line.split("ARGS = ")[1]).strip()
+        
+        if desc != "" and func != "" and args != "":
+            action_queue.append((desc, func, args))
+            desc, func, args = "", "", ""
     
-    return desc, func, args
+    best_desc, best_func, best_args = action_queue.pop(0)
+    print(best_desc)
+    print(best_desc in "ended_emergency_action")
+    if best_desc in "ended_emergency_action":
+        #Check if there is a last action in the action_queue
+        if (last_desc, last_func, last_args) in action_queue:
+            return last_desc, last_func, last_args
+        
+        if len(action_queue) > 0:
+            best_desc, best_func, best_args = action_queue.pop(0)
+            return best_desc, best_func, best_args
+        else:
+            return "none", "none", "none"
+    else:
+        return best_desc, best_func, best_args
 
         
         
