@@ -214,7 +214,7 @@ function WalkToXYZ(x, y, z)
         currentAction = nil
     end)
 
-    player.components.locomotor:PushAction(buffered, false)
+    player.components.locomotor:PushAction(buffered, true)
 
     player:DoTaskInTime(1, function()
         if player.components.locomotor.bufferedaction == buffered then
@@ -1170,7 +1170,7 @@ function PreparePlayerCharacter(player)
         isBusy = true
     end)
 
-    local debug = true
+    local debug = false
 
     player:DoPeriodicTask(1, function()
 
