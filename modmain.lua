@@ -270,7 +270,7 @@ local function Entity(inst, v)
     d.Equippable = v.components.equippable and true
     d.Fuel = v.components.fuel and true
     d.Fueled = v.components.fueled and not v.components.fueled:IsEmpty()
-    d.FueledPercent = v.components.fueled and math.floor(v.components.fueled:GetPercent() * 100)
+    d.FueledPercent = v.components.fueled and v.components.fueled:GetPercent()
     d.Grower = v.components.grower and true
     d.Harvestable = v:HasTag("readyforharvest") or (v.components.stewer and v.components.stewer:IsDone())
     d.Collectable = v.components.inventoryitem and v.components.inventoryitem.canbepickedup and not v:HasTag("heavy") -- PICKUP
@@ -283,7 +283,7 @@ local function Entity(inst, v)
     d.Hammerable = d.Workable and v.components.workable.action == GLOBAL.ACTIONS.HAMMER
     d.Mineable = d.Workable and v.components.workable.action == GLOBAL.ACTIONS.MINE
 
-    d.Distance = math.floor(GetDistanceFrom(v.GUID))
+    d.Distance = GetDistanceFrom(v.GUID)
 
     -- remove all keyx with false values
     for k, v in pairs(d) do
@@ -578,8 +578,8 @@ function GetEntity(guid)
     local ents = GetNearbyEntities(DISTANCE)
     for k, v in pairs(ents) do
         if tostring(v.GUID) == tostring(guid) and not v:IsInLimbo() then
-            -- print("Entity:", v.prefab, "GUID:", v.GUID, "SERVER:", guid, "BOOL:",
-            --     tostring(tostring(v.GUID) == tostring(guid)))
+            print("Entity:", v.prefab, "GUID:", v.GUID, "SERVER:", guid, "BOOL:",
+                tostring(tostring(v.GUID) == tostring(guid)))
             return v
         end
     end
@@ -622,10 +622,10 @@ function GetDistanceFrom(guid)
         local x, y, z = player.Transform:GetWorldPosition()
         local ex, ey, ez = entity.Transform:GetWorldPosition()
         local distance = math.sqrt((x - ex) ^ 2 + (y - ey) ^ 2 + (z - ez) ^ 2)
-        -- print("Distance from ", guid, ": ", distance)
+        print("Distance from ", guid, ": ", distance)
         return distance
     end
-    return 100000
+    return nil
 end
 
 -- switch to guid
@@ -709,7 +709,6 @@ function IsPlayerInLight()
 
 end
 
--- NOT WORKING
 function functions.equip(guid)
     local player = GLOBAL.GetPlayer()
     local inventory = player.components.inventory
@@ -718,7 +717,6 @@ function functions.equip(guid)
     -- if item is in equipslots, return
     for k, v in pairs(inventory.equipslots) do
         if v and v.GUID == guid then
-            print("Item already equipped: ", v.prefab)
             return true
         end
     end
@@ -726,13 +724,11 @@ function functions.equip(guid)
     for k, v in pairs(inventory.itemslots) do
         if v and v.GUID == guid then
             slot = k
-            print("Equipping item: ", v.prefab)
             break
         end
     end
 
     if slot == -1 then
-        print("Item not found in inventory")
         return false
     end
 
@@ -897,9 +893,9 @@ function functions.chop_tree(guid)
             is_chopping = false
         end)
 
-        player.components.locomotor:PushAction(buffered, false)
-        player.components.locomotor:PushAction(buffered, false)
-        player.components.locomotor:PushAction(buffered, false)
+        player.components.locomotor:PushAction(buffered, true)
+        player.components.locomotor:PushAction(buffered, true)
+        player.components.locomotor:PushAction(buffered, true)
 
     end
 end
@@ -990,7 +986,7 @@ function EatFoodByName(item_name)
     return true
 end
 
-function functions.add_fuel(GUID)
+function functions.add_fuel()
     local player = GLOBAL.GetPlayer()
     local inventory = player.components.inventory
     local slot = -1
@@ -1006,13 +1002,7 @@ function functions.add_fuel(GUID)
         return false
     end
 
-    -- get target entity
-    local entity = GetEntity(GUID)
-    if not entity then
-        return false
-    end
-
-    player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, entity, GLOBAL.ACTIONS.ADDFUEL,
+    player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, nil, GLOBAL.ACTIONS.ADDFUEL,
         inventory.itemslots[slot], nil, nil, 0, nil, 2), true)
     return true
 end
