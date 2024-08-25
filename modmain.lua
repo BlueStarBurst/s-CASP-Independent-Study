@@ -162,7 +162,8 @@ function functions.build(item)
                 local recipes = GLOBAL.GetAllRecipes()
                 local recipe = recipes[item]
                 currentAction = "Building campfire"
-                local buffered = GLOBAL.BufferedAction(player, nil, GLOBAL.ACTIONS.BUILD, nil, GLOBAL.Vector3(x, y, z), recipe.name, 0, GLOBAL.Vector3(0,0,0))
+                local buffered = GLOBAL.BufferedAction(player, nil, GLOBAL.ACTIONS.BUILD, nil, GLOBAL.Vector3(x, y, z),
+                    recipe.name, 0, GLOBAL.Vector3(0, 0, 0))
                 -- local buffered = GLOBAL.BufferedAction(player, nil, GLOBAL.ACTIONS.WALKTO, nil, GLOBAL.Vector3(x, y, z),
                 --     nil, 0, true)
 
@@ -174,7 +175,7 @@ function functions.build(item)
             end
         end
 
-        Wander()
+        functions.wander()
         return false
 
     end
@@ -196,17 +197,26 @@ local prev_angle = 0
 function WalkToXYZ(x, y, z)
     local player = GLOBAL.GetPlayer()
 
-    local buffered = GLOBAL.BufferedAction(player, nil, GLOBAL.ACTIONS.WALKTO, nil, GLOBAL.Vector3(x, y, z), nil, 0,
-        true)
-
-    player.components.locomotor:PushAction(buffered, true)
+    print("Walking to: ", x, y, z)
+    local buffered = GLOBAL.BufferedAction(player, nil, GLOBAL.ACTIONS.WALKTO, nil, GLOBAL.Vector3(x, y, z))
 
     -- on success, clear the action
     buffered:AddSuccessAction(function()
+        print("Walking to: ", x, y, z, " success")
+        player.components.locomotor:Clear()
         currentAction = nil
     end)
 
-    player:DoTaskInTime(5, function()
+    -- on failure, clear the action
+    buffered:AddFailAction(function()
+        print("Walking to: ", x, y, z, " failed")
+        player.components.locomotor:Clear()
+        currentAction = nil
+    end)
+
+    player.components.locomotor:PushAction(buffered, false)
+
+    player:DoTaskInTime(1, function()
         if player.components.locomotor.bufferedaction == buffered then
             player.components.locomotor:Clear()
             prev_angle = prev_angle + math.pi / 2
@@ -215,12 +225,29 @@ function WalkToXYZ(x, y, z)
 
 end
 
+local GROUND = GLOBAL.GROUND
+
 function WalkInAngle(angle, distance)
     local player = GLOBAL.GetPlayer()
     local x, y, z = player.Transform:GetWorldPosition()
     local dx = math.cos(angle) * distance
     local dz = math.sin(angle) * distance
+
+    local ground = GLOBAL.GetWorld()
+
+    local tile = GROUND.GRASS
+    if ground and ground.Map then
+        tile = ground.Map:GetTileAtPoint(x + dx, y, z + dz)
+        print("Tile: ", tile)
+    end
+
+    if tile == GROUND.IMPASSABLE then
+        print("Impassable tile")
+        return false
+    end
+
     WalkToXYZ(x + dx, y, z + dz)
+    return true
 end
 
 function functions.walk_to_entity(guid)
@@ -251,7 +278,16 @@ function functions.wander()
     local angle = prev_angle + math.random(-1, 1) * math.pi / 3
     prev_angle = angle
 
-    WalkInAngle(angle, 10)
+    local is_safe = false
+
+    currentAction = "Wandering"
+
+    while not is_safe do
+        angle = angle + math.pi / 3
+        prev_angle = angle
+        is_safe = WalkInAngle(angle, 10)
+        print("Wandering in angle: ", angle, " is safe: ", is_safe)
+    end
 
     print("WANDERING")
 end
@@ -1134,18 +1170,22 @@ function PreparePlayerCharacter(player)
         isBusy = true
     end)
 
-    local debug = false
+    local debug = true
 
     player:DoPeriodicTask(1, function()
 
         if player.components.locomotor.bufferedaction then
-            print("Current action: ", player.components.locomotor.bufferedaction)
+            print("Current action: ", currentAction or "nil", player.components.locomotor.bufferedaction)
             return
         end
 
         if debug then
             --
-            functions["build"]("campfire")
+
+            local debu_func = "wander"
+
+            print("DEBUGGING", debu_func)
+            functions[debu_func]()
             return
         end
 
