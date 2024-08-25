@@ -738,6 +738,29 @@ function functions.equip(guid)
     return true
 end
 
+function functions.unequip(guid)
+    local player = GLOBAL.GetPlayer()
+    local inventory = player.components.inventory
+    local slot = -1
+
+    -- if item is in equipslots, return
+    for k, v in pairs(inventory.equipslots) do
+        if v and v.GUID == guid then
+            slot = k
+            break
+        end
+    end
+
+    if slot == -1 then
+        return false
+    end
+
+    player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, nil, GLOBAL.ACTIONS.UNEQUIP,
+        inventory.equipslots[slot], nil, nil, 0, nil, 2), true)
+
+    return true
+end
+
 function EquipByName(item_name)
     local player = GLOBAL.GetPlayer()
     local inventory = player.components.inventory
