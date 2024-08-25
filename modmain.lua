@@ -108,12 +108,75 @@ function functions.build(item)
                 local count = inventory:Count(ingredient, true)
                 if count < amount then
                     print("Missing ingredient: ", ingredient, " amount: ", amount - count)
-    
+
                 end
             end
         end
 
         return false
+    end
+
+    if item == "campfire" then
+        -- make sure there is nothing flammable nearby
+        local ents = GetNearbyEntities(10)
+        local flammablePositions = {}
+        for k, v in pairs(ents) do
+            if v.components.burnable then
+                local x, y, z = v.Transform:GetWorldPosition()
+                table.insert(flammablePositions, {
+                    x = x,
+                    y = y,
+                    z = z
+                })
+            end
+        end
+
+        local campfire_built = false
+
+        while campfire_built == false do
+            -- randomly select points around the player to build the campfire
+            local x, y, z = GLOBAL.GetPlayer().Transform:GetWorldPosition()
+            local dx = math.random(-10, 10)
+            local dz = math.random(-10, 10)
+            local x = x + dx
+            local z = z + dz
+            print("Trying to build campfire at: ", x, y, z)
+
+            -- check if the point is flammable
+            local flammable = false
+            for k, v in pairs(flammablePositions) do
+                local fx = v.x
+                local fz = v.z
+                local d = math.sqrt((x - fx) ^ 2 + (z - fz) ^ 2)
+                if d < 3 then
+                    flammable = true
+                    break
+                end
+            end
+
+            if not flammable then
+                print("Point is not flammable")
+                -- build the campfire
+                local player = GLOBAL.GetPlayer()
+                local inventory = player.components.inventory
+                local recipes = GLOBAL.GetAllRecipes()
+                local recipe = recipes[item]
+                currentAction = "Building campfire"
+                local buffered = GLOBAL.BufferedAction(player, nil, GLOBAL.ACTIONS.BUILD, nil, GLOBAL.Vector3(x, y, z), recipe.name, 0, GLOBAL.Vector3(0,0,0))
+                -- local buffered = GLOBAL.BufferedAction(player, nil, GLOBAL.ACTIONS.WALKTO, nil, GLOBAL.Vector3(x, y, z),
+                --     nil, 0, true)
+
+                player.components.locomotor:PushAction(buffered, true)
+                -- use the builder component to craft the item
+                return true
+            else
+                print("Point is flammable")
+            end
+        end
+
+        Wander()
+        return false
+
     end
 
     local player = GLOBAL.GetPlayer()
@@ -709,7 +772,7 @@ function EquipByName(item_name)
     return true
 end
 
-function functions.equip_by_name(item_name) 
+function functions.equip_by_name(item_name)
     EquipByName(item_name)
 end
 
@@ -772,8 +835,8 @@ function functions.cut_down_tree()
     if closest then
         player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, closest, GLOBAL.ACTIONS.CHOP, nil, nil,
             nil, 0, nil, 2), true)
-    -- else
-    --     wander()
+        -- else
+        --     wander()
     end
 end
 
@@ -838,7 +901,6 @@ function functions.chop_tree(guid)
         player.components.locomotor:PushAction(buffered, false)
         player.components.locomotor:PushAction(buffered, false)
 
-        
     end
 end
 
@@ -959,7 +1021,7 @@ function functions.stay_near(GUID)
     -- move so that the player is within 5 units of the entity
     local player = GLOBAL.GetPlayer()
     local entity = GetEntity(GUID)
-    
+
     if not entity then
         return false
     end
@@ -1059,10 +1121,18 @@ function PreparePlayerCharacter(player)
         isBusy = true
     end)
 
+    local debug = false
+
     player:DoPeriodicTask(1, function()
 
         if player.components.locomotor.bufferedaction then
             print("Current action: ", player.components.locomotor.bufferedaction)
+            return
+        end
+
+        if debug then
+            --
+            functions["build"]("campfire")
             return
         end
 
@@ -1083,7 +1153,6 @@ function PreparePlayerCharacter(player)
 
                 -- remove spaces from the function name
                 v = string.gsub(v, "%s+", "")
-                
 
                 print("Action: " .. v .. "Args: " .. arg)
 
