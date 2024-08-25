@@ -41,7 +41,7 @@ action(build_campfire_dark, build, campfire) :- time(night), campfire_ingredient
 
 
 action(build_torch_night, build, torch) :- time(night), torch_ingredients, not item_in_inventory(torch, X).
-action(build_axe, build, axe) :- axe_ingredients, not equipment(axe), good_amount(torch, 1).
+action(build_axe, build, axe) :- axe_ingredients, not equipment(axe), good_amount(axe, 1).
 action(build_torch, build, torch) :- torch_ingredients, not equipment(torch), good_amount(torch, 1).
 action(equip_axe, equip, axe) :- not equipment(axe), item_in_inventory(axe, N), -time(night).
 action(collect_log, collect_entity, GUID) :- item_on_screen(log, GUID).
