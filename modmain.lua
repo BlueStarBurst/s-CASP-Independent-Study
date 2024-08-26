@@ -216,7 +216,7 @@ function WalkToXYZ(x, y, z)
 
     player.components.locomotor:PushAction(buffered, true)
 
-    player:DoTaskInTime(1, function()
+    player:DoTaskInTime(3, function()
         if player.components.locomotor.bufferedaction == buffered then
             player.components.locomotor:Clear()
             prev_angle = prev_angle + math.pi / 2
@@ -278,9 +278,11 @@ function functions.wander()
     local angle = prev_angle + math.random(-1, 1) * math.pi / 3
     prev_angle = angle
 
-    local is_safe = false
-
     currentAction = "Wandering"
+    
+    local is_safe = WalkInAngle(angle, 10)
+
+    
 
     while not is_safe do
         angle = angle + math.pi / 3
