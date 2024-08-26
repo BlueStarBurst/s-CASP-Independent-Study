@@ -161,7 +161,6 @@ function functions.build(item)
                 local inventory = player.components.inventory
                 local recipes = GLOBAL.GetAllRecipes()
                 local recipe = recipes[item]
-                currentAction = "Building campfire"
                 local buffered = GLOBAL.BufferedAction(player, nil, GLOBAL.ACTIONS.BUILD, nil, GLOBAL.Vector3(x, y, z),
                     recipe.name, 0, GLOBAL.Vector3(0, 0, 0))
                 -- local buffered = GLOBAL.BufferedAction(player, nil, GLOBAL.ACTIONS.WALKTO, nil, GLOBAL.Vector3(x, y, z),
@@ -279,7 +278,7 @@ function functions.wander()
     prev_angle = angle
 
     currentAction = "Wandering"
-    
+
     local is_safe = WalkInAngle(angle, 10)
 
     
@@ -362,7 +361,7 @@ function GetEquippedItems()
 end
 
 function GetNearbyEntities(distance)
-    print("Getting nearby entities")
+    -- print("Getting nearby entities")
     local player = GLOBAL.GetPlayer()
     local x, y, z = player.Transform:GetWorldPosition()
 
@@ -384,7 +383,7 @@ function GetParsedEntities(distance)
             table.insert(parsed_ents, entity)
         end
     end
-    print("Parsed entities: ", parsed_ents)
+    -- print("Parsed entities: ", parsed_ents)
     return parsed_ents
 end
 
@@ -616,8 +615,8 @@ function GetEntity(guid)
     local ents = GetNearbyEntities(DISTANCE)
     for k, v in pairs(ents) do
         if tostring(v.GUID) == tostring(guid) and not v:IsInLimbo() then
-            print("Entity:", v.prefab, "GUID:", v.GUID, "SERVER:", guid, "BOOL:",
-                tostring(tostring(v.GUID) == tostring(guid)))
+            -- print("Entity:", v.prefab, "GUID:", v.GUID, "SERVER:", guid, "BOOL:",
+            --     tostring(tostring(v.GUID) == tostring(guid)))
             return v
         end
     end
@@ -660,7 +659,7 @@ function GetDistanceFrom(guid)
         local x, y, z = player.Transform:GetWorldPosition()
         local ex, ey, ez = entity.Transform:GetWorldPosition()
         local distance = math.sqrt((x - ex) ^ 2 + (y - ey) ^ 2 + (z - ez) ^ 2)
-        print("Distance from ", guid, ": ", distance)
+        -- print("Distance from ", guid, ": ", distance)
         return distance
     end
     return nil
@@ -754,13 +753,13 @@ function functions.equip(guid)
 
     -- if item is in equipslots, return
     for k, v in pairs(inventory.equipslots) do
-        if v and v.GUID == guid then
+        if v and tostring(v.GUID) == tostring(guid) then
             return true
         end
     end
 
     for k, v in pairs(inventory.itemslots) do
-        if v and v.GUID == guid then
+        if v and tostring(v.GUID) == tostring(guid) then
             slot = k
             break
         end
@@ -783,7 +782,7 @@ function functions.unequip(guid)
 
     -- if item is in equipslots, return
     for k, v in pairs(inventory.equipslots) do
-        if v and v.GUID == guid then
+        if v and tostring(v.GUID) == tostring(guid) then
             slot = k
             break
         end
@@ -807,6 +806,7 @@ function EquipByName(item_name)
     -- if item is in equipslots, return
     for k, v in pairs(inventory.equipslots) do
         if v and v.prefab == item_name then
+            print("GUID", v.GUID)
             return true
         end
     end
@@ -814,6 +814,7 @@ function EquipByName(item_name)
     for k, v in pairs(inventory.itemslots) do
         if v and v.prefab == item_name then
             slot = k
+            print("GUID", v.GUID)
             break
         end
     end
@@ -1176,18 +1177,15 @@ function PreparePlayerCharacter(player)
 
     player:DoPeriodicTask(1, function()
 
-        if player.components.locomotor.bufferedaction then
-            print("Current action: ", currentAction or "nil", player.components.locomotor.bufferedaction)
-            return
-        end
-
         if debug then
             --
 
-            local debu_func = "wander"
+            local debu_func = "equip"
 
             print("DEBUGGING", debu_func)
-            functions[debu_func]()
+            functions[debu_func](100028)
+            -- EquipByName("axe")
+
             return
         end
 
@@ -1209,7 +1207,14 @@ function PreparePlayerCharacter(player)
                 -- remove spaces from the function name
                 v = string.gsub(v, "%s+", "")
 
-                print("Action: " .. v .. "Args: " .. arg)
+                print("Action: " .. v .. " Args: " .. arg, currentAction or "nil", v .. " " .. arg)
+
+                if currentAction == v .. " " .. arg and player.components.locomotor.bufferedaction then
+                    print("Repeating")
+                    return
+                end
+
+                print("Running function: ", v)
 
                 -- for k, v in pairs(_G) do
                 --     print(k, v)
@@ -1221,6 +1226,9 @@ function PreparePlayerCharacter(player)
                 if func then
                     print("Running function: ", v)
                     func(arg)
+                    currentAction = v .. " " .. arg
+                else
+                    print("Function not found: ", v)
                 end
 
             end
