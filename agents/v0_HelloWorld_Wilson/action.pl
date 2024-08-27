@@ -29,16 +29,18 @@ action(equip_torch_night_hostile, equip, GUID) :- time(night), hostile(E), not e
 action(run_away_from_enemy, run_away, GUID) :- hostile(GUID).
 action(eat_food_low, eat_food, GUID) :- hunger(low), item_in_inventory(X, N), edible(X), slot_in_inventory(X, GUID).
 action(equip_torch_night_no_campfire, equip, GUID) :- time(night), not item_on_screen(campfire, X), item_in_inventory(torch, X), not equipment(torch), slot_in_inventory(torch, GUID).
+action(unequip_torch_day, unequip, GUID) :- time(day), equipment(torch), equipment_guid(torch, GUID).
 
 action(ended_emergency_action, nil, nil).
 
 action(pick_flower, pick_entity, GUID) :- not time(night), sanity(low), item_on_screen(flower, GUID).
 action(no_repeat_wander_flower, wander, nil) :- not time(night), sanity(low).
 
-action(cook_food, cook, GUID) :- cookable(X), slot_in_inventory(X, GUID), time(night).
+action(cook_food, cook, GUID) :- cookable(X), slot_in_inventory(X, GUID), time(night), item_on_screen(campfire, X).
+%action(refuel_campfire, add_fuel, GUID) :- time(night), item_in_inventory(log, N), N.>.0, item_on_screen(campfire, GUID), %ADD FUEL .
 action(no_repeat_walk_to_fueled_campfire, walk_to_entity, GUID) :- time(night), fueled(GUID), item_on_screen(campfire, GUID).
 action(build_campfire_dark, build, campfire) :- time(night), campfire_ingredients, not item_on_screen(campfire, X).
-
+action(build_campfire_dusk, build, campfire) :- time(dusk, end), campfire_ingredients, not item_on_screen(campfire, X).
 
 action(build_torch_night, build, torch) :- time(night), torch_ingredients, not item_in_inventory(torch, X).
 action(build_axe, build, axe) :- axe_ingredients, not equipment(axe), good_amount(axe, 1).
