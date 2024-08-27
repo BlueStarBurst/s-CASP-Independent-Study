@@ -27,6 +27,7 @@ print("sCASP reader modmain.lua loaded")
 -- SERVER FUNCTIONS --
 
 local currentAction = nil
+local complex_action = false
 
 local functions = {}
 
@@ -116,6 +117,8 @@ function functions.build(item)
         return false
     end
 
+    complex_action = true
+
     if item == "campfire" then
         -- make sure there is nothing flammable nearby
         local ents = GetNearbyEntities(10)
@@ -162,12 +165,17 @@ function functions.build(item)
                 local recipes = GLOBAL.GetAllRecipes()
                 local recipe = recipes[item]
                 local buffered = GLOBAL.BufferedAction(player, nil, GLOBAL.ACTIONS.BUILD, nil, GLOBAL.Vector3(x, y, z),
-                    recipe.name, 0, GLOBAL.Vector3(0, 0, 0))
+                    recipe.name, 0)
                 -- local buffered = GLOBAL.BufferedAction(player, nil, GLOBAL.ACTIONS.WALKTO, nil, GLOBAL.Vector3(x, y, z),
                 --     nil, 0, true)
 
                 player.components.locomotor:PushAction(buffered, true)
                 -- use the builder component to craft the item
+
+                player:DoTaskInTime(3, function()
+                    complex_action = false
+                end)
+
                 return true
             else
                 print("Point is flammable")
@@ -188,6 +196,11 @@ function functions.build(item)
     if builder then
         builder:MakeRecipe(recipe)
     end
+
+    player:DoTaskInTime(3, function()
+        complex_action = false
+    end)
+
     return true
 end
 
@@ -1180,10 +1193,10 @@ function PreparePlayerCharacter(player)
         if debug then
             --
 
-            local debu_func = "equip"
+            local debu_func = "build"
 
             print("DEBUGGING", debu_func)
-            functions[debu_func](100028)
+            functions[debu_func]("campfire")
             -- EquipByName("axe")
 
             return
@@ -1209,7 +1222,7 @@ function PreparePlayerCharacter(player)
 
                 print("Action: " .. v .. " Args: " .. arg, currentAction or "nil", v .. " " .. arg)
 
-                if currentAction == v .. " " .. arg and player.components.locomotor.bufferedaction then
+                if currentAction == v .. " " .. arg and (player.components.locomotor.bufferedaction or complex_action) then
                     print("Repeating")
                     return
                 end
