@@ -833,7 +833,7 @@ function EquipByName(item_name)
     end
 
     if slot == -1 then
-        build(item_name)
+        functions.build(item_name)
         return false
     end
 
