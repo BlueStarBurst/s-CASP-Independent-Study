@@ -1242,6 +1242,12 @@ function PreparePlayerCharacter(player)
 
                 -- run the function with the arguments ex: chop_tree(103812)
                 -- _G[v](arg)
+
+                -- if action is not chop_tree, set is_chopping to false
+                if v ~= "chop_tree" then
+                    is_chopping = false
+                end
+
                 local func = functions[v]
                 if func then
                     print("Running function: ", v)
