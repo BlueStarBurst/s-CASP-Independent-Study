@@ -1061,13 +1061,15 @@ function EatFoodByName(item_name)
     return true
 end
 
-function functions.add_fuel()
+-- add fuel to the entity with guid
+function functions.add_fuel(GUID)
     local player = GLOBAL.GetPlayer()
     local inventory = player.components.inventory
     local slot = -1
 
+    -- use logs as fuel
     for k, v in pairs(inventory.itemslots) do
-        if v.components.fuel then
+        if v.prefab == "log" then
             slot = k
             break
         end
@@ -1077,9 +1079,14 @@ function functions.add_fuel()
         return false
     end
 
-    player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, nil, GLOBAL.ACTIONS.ADDFUEL,
-        inventory.itemslots[slot], nil, nil, 0, nil, 2), true)
-    return true
+    local entity = GetEntity(GUID)
+
+    if entity then
+        player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, entity, GLOBAL.ACTIONS.ADDFUEL,
+            inventory.itemslots[slot], nil, nil, 0, nil, 2), true)
+        return true
+    end
+    
 end
 
 function functions.stay_near(GUID)

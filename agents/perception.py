@@ -37,6 +37,7 @@ def convert_json_to_predicate(json_string_data: str):
         entity_name = EQIVALENT_ENTITY_DICT.get(entity_name, entity_name)
                 
         predicates.append(f"item_on_screen({entity_name}, {entity['GUID']})")
+        predicates.append(f"\nguid({entity['GUID']})")
         for k,v in entity.items():
             if k == "Prefab" or k == "GUID":
                 continue
@@ -46,6 +47,8 @@ def convert_json_to_predicate(json_string_data: str):
                 predicates.append(f"distance({entity['GUID']}, {v})")
             elif v == True:
                 predicates.append(f"{str.lower(k)}({entity['GUID']})") 
+            else:
+                predicates.append(f"{str.lower(k)}({entity['GUID']}, {v})")
     
     
     # Load the inventory data to predicate
@@ -53,6 +56,7 @@ def convert_json_to_predicate(json_string_data: str):
     for entity in json_data["inventory"]:
         inventory[entity["Prefab"]] = inventory.get(entity["Prefab"], 0) + entity["Quantity"]
         predicates.append(f"slot_in_inventory({entity['Prefab']}, {entity['GUID']})")
+        predicates.append(f"guid({entity['GUID']})")
         for k,v in entity.items():
             if k == "Prefab" or k == "GUID":
                 continue
@@ -68,6 +72,7 @@ def convert_json_to_predicate(json_string_data: str):
     for entity in json_data["equipped"]:
         predicates.append(f"equipment({entity['Prefab']})") 
         predicates.append(f"equipment_guid({entity['Prefab']}, {entity['GUID']})")
+        predicates.append(f"guid({entity['GUID']})")
         for k,v in entity.items():
             if k == "Prefab" or k == "GUID":
                 continue
