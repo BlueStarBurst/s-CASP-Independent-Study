@@ -52,7 +52,7 @@ action(build_campfire_dark, build, campfire) :- time(night), campfire_ingredient
 action(build_torch_night, build, torch) :- time(night), torch_ingredients, not torch_exists.
 action(build_axe, build, axe) :- axe_ingredients, not equipment(axe), good_amount(axe, 1).
 action(build_torch, build, torch) :- torch_ingredients, not torch_exists.
-action(equip_axe, equip, axe) :- not equipment(axe), item_in_inventory(axe, N), not time(night).
+action(equip_axe, equip, GUID) :- not equipment(axe), item_in_inventory(axe, N), not time(night), slot_in_inventory(axe, GUID).
 action(collect_log, collect_entity, GUID) :- item_on_screen(log, GUID).
 action(chop_tree, chop_tree, GUID) :- choppable(GUID), equipment(axe), good_amount(log, 16).
 action(collect_anything, collect_entity, GUID) :- item_on_screen(X, GUID), good_amount(X, 16), good_item(X), collectable(GUID).

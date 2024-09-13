@@ -216,14 +216,19 @@ function WalkToXYZ(x, y, z)
     buffered:AddSuccessAction(function()
         print("Walking to: ", x, y, z, " success")
         player.components.locomotor:Clear()
-        currentAction = nil
+        if not complex_action then
+            currentAction = nil
+        end
     end)
 
     -- on failure, clear the action
     buffered:AddFailAction(function()
         print("Walking to: ", x, y, z, " failed")
         player.components.locomotor:Clear()
-        currentAction = nil
+        if not complex_action then
+            currentAction = nil
+        end
+        
     end)
 
     player.components.locomotor:PushAction(buffered, true)
@@ -1227,14 +1232,12 @@ function PreparePlayerCharacter(player)
                 -- remove spaces from the function name
                 v = string.gsub(v, "%s+", "")
 
-                print("Action: " .. v .. " Args: " .. arg, currentAction or "nil", v .. " " .. arg)
+                print("Action: " .. v .. " Args: " .. arg,"CurrentAction:", currentAction or "nil", v .. " " .. arg)
 
-                if currentAction == v .. " " .. arg and (player.components.locomotor.bufferedaction or complex_action) then
+                if complex_action or (currentAction == v and (player.components.locomotor.bufferedaction or complex_action)) then
                     print("Repeating")
                     return
                 end
-
-                print("Running function: ", v)
 
                 -- for k, v in pairs(_G) do
                 --     print(k, v)
@@ -1251,8 +1254,9 @@ function PreparePlayerCharacter(player)
                 local func = functions[v]
                 if func then
                     print("Running function: ", v)
-                    func(arg)
                     currentAction = v .. " " .. arg
+                    func(arg)
+                    
                 else
                     print("Function not found: ", v)
                 end

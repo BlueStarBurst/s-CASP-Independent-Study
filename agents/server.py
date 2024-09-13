@@ -28,7 +28,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             print(f"Connected by {addr}")
             while True:
                 data = conn.recv(1024*10000)
-                data = data.decode("utf-8") # decode the data from json
+                data = data.decode("utf-8")  # decode the data from json
                 
                 print(data)
                 with open("data.json", "w") as f:
