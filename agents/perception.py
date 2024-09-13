@@ -160,6 +160,9 @@ def get_action(json_string_data: str):
             action_queue.append((desc, func, args))
             desc, func, args = "", "", ""
     
+    if len(action_queue) == 0:
+        return "none", "none", "none"
+    
     best_desc, best_func, best_args = action_queue.pop(0)
     print(best_desc)
     print(best_desc in "ended_emergency_action")
