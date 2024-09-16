@@ -8,6 +8,10 @@ good_item(cutgrass).
 good_item(berries).
 good_item(sapling).
 
+valid_time(early).
+valid_time(mid).
+valid_time(end).
+
 item_present(X) :- item_in_inventory(X,N), N .>. 0.
 
 good_amount(X, MAX) :- not item_present(X).
@@ -21,12 +25,11 @@ campfire_ingredients:- item_in_inventory(log, X), X.>=.2, item_in_inventory(cutg
 
 garland_ingredients:- item_in_inventory(petals, X), X.>=.12.
 
-time(A) :- time(A, T).
+time(A) :- time(A, T), valid_time(T).
 
 
 campfire_exists :- item_on_screen(campfire, X), guid(X).
 torch_exists :- slot_in_inventory(torch, X), guid(X).
-
 hunger(half) :- hunger(low).
 sanity(half) :- sanity(low).
 
@@ -40,24 +43,23 @@ action(unequip_torch_day, unequip, GUID) :- time(day), equipment(torch), equipme
 action(ended_emergency_action, nil, nil).
 
 action(pick_flower, pick_entity, GUID) :- not time(night), sanity(half), item_on_screen(flower, GUID).
-% action(no_repeat_wander_flower, wander, nil) :- not time(night), sanity(half).
+% action(no_repeat_wander_flower, wander, nil) :- not time(night), sanity(low).
 
 action(cook_food, cook, GUID) :- cookable(X), slot_in_inventory(X, GUID), time(night), item_on_screen(campfire, Y).
-action(no_repeat_refuel_campfire, add_fuel, GUID) :- time(night), item_in_inventory(log, N), N.>.0, item_on_screen(campfire, GUID), guid(GUID), fueled(GUID), fueledpercent(GUID, X), X.<.0.3.
+action(refuel_campfire, add_fuel, GUID) :- time(night), item_in_inventory(log, N), N.>.0, item_on_screen(campfire, GUID), guid(GUID), fueled(GUID), fueledpercent(GUID, X), X.<.0.3.
 action(no_repeat_walk_to_fueled_campfire, stay_near, GUID) :- time(night), fueled(GUID), item_on_screen(campfire, GUID), guid(GUID), distance(GUID, X), X.>.1.
 action(no_repeat_walk_to_fueled_campfire, stay_near, GUID) :- time(dusk, end), fueled(GUID), item_on_screen(campfire, GUID), guid(GUID), distance(GUID, X), X.>.10.
 action(build_campfire_dark, build, campfire) :- time(night), campfire_ingredients, not campfire_exists.
-%action(build_campfire_dusk, build, campfire) :- time(dusk, end), campfire_ingredients, not campfire_exists.
+action(build_campfire_dusk, build, campfire) :- time(dusk, end), campfire_ingredients, not campfire_exists.
 
-action(build_torch_night, build, torch) :- time(night), torch_ingredients, not torch_exists.
+action(build_torch_night, build, torch) :- time(night, T), valid_time(T), torch_ingredients, not torch_exists.
 action(build_axe, build, axe) :- axe_ingredients, not equipment(axe), good_amount(axe, 1).
 action(build_torch, build, torch) :- torch_ingredients, not torch_exists.
-action(equip_axe, equip, GUID) :- not equipment(axe), item_in_inventory(axe, N), not time(night), slot_in_inventory(axe, GUID).
+action(equip_axe, equip, axe) :- not equipment(axe), item_in_inventory(axe, N), not time(night).
 action(collect_log, collect_entity, GUID) :- item_on_screen(log, GUID).
-action(chop_tree, chop_tree, GUID) :- choppable(GUID), equipment(axe), good_amount(log, 16).
-action(collect_anything, collect_entity, GUID) :- item_on_screen(X, GUID), good_amount(X, 16), good_item(X), collectable(GUID).
-action(pick_anything, pick_entity, GUID) :- item_on_screen(X, GUID), good_amount(X, 16), good_item(X), pickable(GUID).
-action(no_repeat_wander, wander, nil) :- not time(night).
+action(chop_tree, chop_tree, GUID) :- choppable(GUID), equipment(axe), good_amount(log, 10).
+action(collect_anything, collect_entity, GUID) :- item_on_screen(X, GUID), good_amount(X, 10), good_item(X), collectable(GUID).
+action(pick_anything, pick_entity, GUID) :- item_on_screen(X, GUID), good_amount(X, 10), good_item(X), pickable(GUID).
+action(no_repeat_wander, wander, nil) :- not time(night), not time(dusk, end).
+
 action(do_nothing, nil, nil).
-
-

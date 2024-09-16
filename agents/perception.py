@@ -105,6 +105,8 @@ def convert_json_to_predicate(json_string_data: str):
     currentPhase = json_data["time"]["currentPhase"]
     percentagePhase = json_data["time"]["percentagePhasePassed"]
     predicates.append(f"time({currentPhase}, {classify_fraction(percentagePhase, ['early', 'mid', 'end'])})")
+    predicates.append(f"current_time({classify_fraction(percentagePhase, ['early', 'mid', 'end'])})")
+    
     
     predicates_str = ""
     for predicate in predicates:

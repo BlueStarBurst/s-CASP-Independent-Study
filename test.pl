@@ -1,20 +1,11 @@
-% default all items to not on screen
-guid(109761).
-guid(109762).
-guid(109763).
+time(night, early).
+current_time(early).
 
-item_on_screen(other, 109761).
-item_on_screen(other, 109762).
-item_on_screen(campfire, 109763).
-quantity(109761, 1).
-
-% item_on_screen(campfire, 109761).
-time(dusk, end).
-campfire_ingredients.
+time(A, T) :- time(A, T), current_time(T).
 
 
-campfire_exists :- item_on_screen(campfire, X), guid(X).
+test(right) :- time(night).
+test(wrong) :- not time(night).
 
-action(build_campfire_dusk, build, campfire) :- time(dusk, end), campfire_ingredients, not item_on_screen(campfire, X), guid(X).
-
-?- action(DESC, FUNC, ARGS).
+% ?- test(A).
+?- 
